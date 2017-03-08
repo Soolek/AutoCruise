@@ -1,18 +1,17 @@
 # AutoCruise
 .Net vision based cruise and steer controller
 
-1) XInput
+InputProvider: OnFrontViewChange, OnRadarChange, OnPositionChange ("gps", orientation), OnStatusChange (speed, gear, ignition)  
+InputProvider implementation: LfsInputProvider
 
-2) LFS interface (output)
 
-2.1) LFS output enhancement (ALS)
+OutputProvider: SetAcc, SetBrake, SetClutch, SetSteer, ChangeGearUp, ChangeGearDown, ChangeIgnitionSwitch)  
+OutputProvider implementation: VJoyOutputProvider
 
-3) LFS input
 
-4) Vision algorithm
+DriveController: (inputProvider, outputProvider)  
+DriveController implementation: AutoDrive, JoyProxy(bool: ALS)
 
-5) A.I.
 
-???
-
-999) Profit!
+main: display (InputProvider, DriveController, OutputProvider) data, switch between middleWares  
+idea: any implementation or InputProvider, OutputProvider, DriveController will have a property named "Settings" deriving from "ISettings" implementation which will contain public properties to change/display in main view (use display name and group)
