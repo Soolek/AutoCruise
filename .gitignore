@@ -3,3 +3,5 @@ bin
 obj
 /AutoCruise/obj
 /AutoCruise/bin
+packages
+.vs

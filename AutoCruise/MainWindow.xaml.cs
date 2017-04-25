@@ -33,6 +33,15 @@ namespace AutoCruise
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            //using (ScreenCapture screenCapture = new ScreenCapture())
+            //{
+            //    var scrShot = screenCapture.GetScreenShot();
+            //    scrShot.Save("D:\\test.jpg");
+
+            //    var bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(scrShot.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            //    var imgBrush = new ImageBrush();
+            //    this.Background = imgBrush;
+            //}
             _cruise.StartCruising();
         }
     }

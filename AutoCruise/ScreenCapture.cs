@@ -9,7 +9,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
 
-namespace AutoCruise.Main
+namespace AutoCruise
 {
     public class ScreenCapture : IDisposable
     {
@@ -40,8 +40,8 @@ namespace AutoCruise.Main
             var output1 = output.QueryInterface<Output1>();
 
             // Width/Height of desktop to capture
-            _width = 800;//((Rectangle)output.Description.DesktopBounds).Width;
-            _height = 600;//((Rectangle)output.Description.DesktopBounds).Height;
+            _width = output.Description.DesktopBounds.Right - output.Description.DesktopBounds.Left;
+            _height = output.Description.DesktopBounds.Bottom - output.Description.DesktopBounds.Top;
 
             // Create Staging texture CPU-accessible
             _textureDesc = new Texture2DDescription
@@ -57,7 +57,7 @@ namespace AutoCruise.Main
                 SampleDescription = { Count = 1, Quality = 0 },
                 Usage = ResourceUsage.Staging
             };
-            
+
 
             // Duplicate the output
             _duplicatedOutput = output1.DuplicateOutput(_device);
@@ -66,6 +66,7 @@ namespace AutoCruise.Main
         public Bitmap GetScreenShot()
         {
             var screenTexture = new Texture2D(_device, _textureDesc);
+            var bitmap = new System.Drawing.Bitmap(_width, _height, PixelFormat.Format32bppArgb);
 
             bool captureDone = false;
             for (int i = 0; !captureDone; i++)
@@ -88,7 +89,7 @@ namespace AutoCruise.Main
                         var mapSource = _device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
                         // Create Drawing.Bitmap
-                        var bitmap = new System.Drawing.Bitmap(_width, _height, PixelFormat.Format32bppArgb);
+
                         var boundsRect = new System.Drawing.Rectangle(0, 0, _width, _height);
 
                         // Copy pixels from screen capture Texture to GDI bitmap
@@ -128,11 +129,13 @@ namespace AutoCruise.Main
                     }
                 }
             }
+
+            return bitmap;
         }
 
         public void Dispose()
         {
-            
+
         }
     }
 }

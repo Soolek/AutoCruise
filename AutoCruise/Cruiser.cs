@@ -33,7 +33,6 @@ namespace AutoCruise
                     ScreenCapture screenCapture = new ScreenCapture();
                     try
                     {
-
                         while (!_cancelToken.IsCancellationRequested)
                         {
                             Work(screenCapture);
@@ -47,6 +46,10 @@ namespace AutoCruise
                         }
                     }
                     catch (OperationCanceledException)
+                    {
+
+                    }
+                    finally
                     {
                         screenCapture.Dispose();
                     }
