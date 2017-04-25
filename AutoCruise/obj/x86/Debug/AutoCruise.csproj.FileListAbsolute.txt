@@ -1,0 +1,12 @@
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.csprojResolveAssemblyReference.cache
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\MainWindow.baml
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\MainWindow.g.cs
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\App.g.cs
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.Main_MarkupCompile.cache
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.Main.g.resources
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.Main.Properties.Resources.resources
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.csproj.GenerateResource.Cache
+D:\git\AutoCruise\AutoCruise\bin\Debug\AutoCruise.Main.exe
+D:\git\AutoCruise\AutoCruise\bin\Debug\AutoCruise.Main.pdb
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.Main.exe
+D:\git\AutoCruise\AutoCruise\obj\x86\Debug\AutoCruise.Main.pdb

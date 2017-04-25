@@ -1,13 +1,54 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCruise.Main", "AutoCruise.Main\AutoCruise.Main.csproj", "{435F259E-567C-4324-A389-601DBE452317}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCruise", "AutoCruise\AutoCruise.csproj", "{435F259E-567C-4324-A389-601DBE452317}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCruise.Interfaces", "AutoCruise.Interfaces\AutoCruise.Interfaces.csproj", "{410D50FE-CE5A-441B-B899-B24C45E00496}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCruise.XInput", "AutoCruise.XInput\AutoCruise.XInput.csproj", "{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCruise.LFS", "AutoCruise.LFS\AutoCruise.LFS.csproj", "{541C9787-8E5C-4BA3-9F02-538B0AFD9457}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF191ECB-EE99-403B-98BE-5D11D8F7FE66}"
+	ProjectSection(SolutionItems) = preProject
+		Lib\SharpDX\SharpDX.Animation.dll = Lib\SharpDX\SharpDX.Animation.dll
+		Lib\SharpDX\SharpDX.Animation.xml = Lib\SharpDX\SharpDX.Animation.xml
+		Lib\SharpDX\SharpDX.D3DCompiler.dll = Lib\SharpDX\SharpDX.D3DCompiler.dll
+		Lib\SharpDX\SharpDX.D3DCompiler.xml = Lib\SharpDX\SharpDX.D3DCompiler.xml
+		Lib\SharpDX\SharpDX.Desktop.dll = Lib\SharpDX\SharpDX.Desktop.dll
+		Lib\SharpDX\SharpDX.Desktop.xml = Lib\SharpDX\SharpDX.Desktop.xml
+		Lib\SharpDX\SharpDX.Direct2D1.dll = Lib\SharpDX\SharpDX.Direct2D1.dll
+		Lib\SharpDX\SharpDX.Direct2D1.xml = Lib\SharpDX\SharpDX.Direct2D1.xml
+		Lib\SharpDX\SharpDX.Direct3D10.dll = Lib\SharpDX\SharpDX.Direct3D10.dll
+		Lib\SharpDX\SharpDX.Direct3D10.xml = Lib\SharpDX\SharpDX.Direct3D10.xml
+		Lib\SharpDX\SharpDX.Direct3D11.dll = Lib\SharpDX\SharpDX.Direct3D11.dll
+		Lib\SharpDX\SharpDX.Direct3D11.Effects.dll = Lib\SharpDX\SharpDX.Direct3D11.Effects.dll
+		Lib\SharpDX\SharpDX.Direct3D11.Effects.xml = Lib\SharpDX\SharpDX.Direct3D11.Effects.xml
+		Lib\SharpDX\SharpDX.Direct3D11.xml = Lib\SharpDX\SharpDX.Direct3D11.xml
+		Lib\SharpDX\SharpDX.Direct3D12.dll = Lib\SharpDX\SharpDX.Direct3D12.dll
+		Lib\SharpDX\SharpDX.Direct3D12.xml = Lib\SharpDX\SharpDX.Direct3D12.xml
+		Lib\SharpDX\SharpDX.Direct3D9.dll = Lib\SharpDX\SharpDX.Direct3D9.dll
+		Lib\SharpDX\SharpDX.Direct3D9.xml = Lib\SharpDX\SharpDX.Direct3D9.xml
+		Lib\SharpDX\SharpDX.DirectComposition.dll = Lib\SharpDX\SharpDX.DirectComposition.dll
+		Lib\SharpDX\SharpDX.DirectComposition.xml = Lib\SharpDX\SharpDX.DirectComposition.xml
+		Lib\SharpDX\SharpDX.DirectInput.dll = Lib\SharpDX\SharpDX.DirectInput.dll
+		Lib\SharpDX\SharpDX.DirectInput.xml = Lib\SharpDX\SharpDX.DirectInput.xml
+		Lib\SharpDX\SharpDX.DirectManipulation.dll = Lib\SharpDX\SharpDX.DirectManipulation.dll
+		Lib\SharpDX\SharpDX.DirectManipulation.xml = Lib\SharpDX\SharpDX.DirectManipulation.xml
+		Lib\SharpDX\SharpDX.DirectSound.dll = Lib\SharpDX\SharpDX.DirectSound.dll
+		Lib\SharpDX\SharpDX.DirectSound.xml = Lib\SharpDX\SharpDX.DirectSound.xml
+		Lib\SharpDX\SharpDX.dll = Lib\SharpDX\SharpDX.dll
+		Lib\SharpDX\SharpDX.DXGI.dll = Lib\SharpDX\SharpDX.DXGI.dll
+		Lib\SharpDX\SharpDX.DXGI.xml = Lib\SharpDX\SharpDX.DXGI.xml
+		Lib\SharpDX\SharpDX.Mathematics.dll = Lib\SharpDX\SharpDX.Mathematics.dll
+		Lib\SharpDX\SharpDX.Mathematics.xml = Lib\SharpDX\SharpDX.Mathematics.xml
+		Lib\SharpDX\SharpDX.MediaFoundation.dll = Lib\SharpDX\SharpDX.MediaFoundation.dll
+		Lib\SharpDX\SharpDX.MediaFoundation.xml = Lib\SharpDX\SharpDX.MediaFoundation.xml
+		Lib\SharpDX\SharpDX.RawInput.dll = Lib\SharpDX\SharpDX.RawInput.dll
+		Lib\SharpDX\SharpDX.RawInput.xml = Lib\SharpDX\SharpDX.RawInput.xml
+		Lib\SharpDX\SharpDX.XAudio2.dll = Lib\SharpDX\SharpDX.XAudio2.dll
+		Lib\SharpDX\SharpDX.XAudio2.xml = Lib\SharpDX\SharpDX.XAudio2.xml
+		Lib\SharpDX\SharpDX.XInput.dll = Lib\SharpDX\SharpDX.XInput.dll
+		Lib\SharpDX\SharpDX.XInput.xml = Lib\SharpDX\SharpDX.XInput.xml
+		Lib\SharpDX\SharpDX.xml = Lib\SharpDX\SharpDX.xml
+		Lib\SharpDX\sharpdx_direct3d11_1_effects_arm.dll = Lib\SharpDX\sharpdx_direct3d11_1_effects_arm.dll
+		Lib\SharpDX\sharpdx_direct3d11_1_effects_x64.dll = Lib\SharpDX\sharpdx_direct3d11_1_effects_x64.dll
+		Lib\SharpDX\sharpdx_direct3d11_1_effects_x86.dll = Lib\SharpDX\sharpdx_direct3d11_1_effects_x86.dll
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,36 +70,6 @@ Global
 		{435F259E-567C-4324-A389-601DBE452317}.Release|Mixed Platforms.Build.0 = Release|x86
 		{435F259E-567C-4324-A389-601DBE452317}.Release|x86.ActiveCfg = Release|x86
 		{435F259E-567C-4324-A389-601DBE452317}.Release|x86.Build.0 = Release|x86
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Release|Any CPU.Build.0 = Release|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{410D50FE-CE5A-441B-B899-B24C45E00496}.Release|x86.ActiveCfg = Release|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{A8D1CCC5-CFFE-4C4D-B2FB-1CFB71D15967}.Release|x86.ActiveCfg = Release|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Release|Any CPU.Build.0 = Release|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{541C9787-8E5C-4BA3-9F02-538B0AFD9457}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
