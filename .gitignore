@@ -1,3 +1,5 @@
 *.cache
 bin
 obj
+/AutoCruise/obj
+/AutoCruise/bin

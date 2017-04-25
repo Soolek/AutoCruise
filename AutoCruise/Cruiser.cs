@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using AutoCruise.Main;
 
 namespace AutoCruise
 {
@@ -29,11 +30,13 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
+                    ScreenCapture screenCapture = new ScreenCapture();
                     try
                     {
+
                         while (!_cancelToken.IsCancellationRequested)
                         {
-                            Work();
+                            Work(screenCapture);
                             frameCounter++;
                             if ((DateTime.Now - time).TotalSeconds > 1)
                             {
@@ -45,15 +48,15 @@ namespace AutoCruise
                     }
                     catch (OperationCanceledException)
                     {
-                        Console.WriteLine("Canceled!");
+                        screenCapture.Dispose();
                     }
                 });
             _cruiseThread.Start();
         }
 
-        private void Work()
+        private void Work(ScreenCapture screenCapture)
         {
-            
+            var screenShot = screenCapture.GetScreenShot();
         }
 
         public void Dispose()
