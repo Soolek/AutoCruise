@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using AutoCruise.Main;
+using AutoCruise.ScreenCapture;
 
 namespace AutoCruise
 {
@@ -30,7 +31,7 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
-                    ScreenCapture screenCapture = new ScreenCapture();
+                    var screenCapture = new GraphicsScreenCapture();
                     try
                     {
                         while (!_cancelToken.IsCancellationRequested)
@@ -39,7 +40,7 @@ namespace AutoCruise
                             frameCounter++;
                             if ((DateTime.Now - time).TotalSeconds > 1)
                             {
-                                Console.WriteLine("FPS: " + frameCounter);
+                                Debug.WriteLine("FPS: " + frameCounter);
                                 frameCounter = 0;
                                 time = DateTime.Now;
                             }
@@ -57,9 +58,12 @@ namespace AutoCruise
             _cruiseThread.Start();
         }
 
-        private void Work(ScreenCapture screenCapture)
+        private void Work(IScreenCapture screenCapture)
         {
-            var screenShot = screenCapture.GetScreenShot();
+            using (var screenShot = screenCapture.GetScreenShot())
+            {
+
+            }
         }
 
         public void Dispose()

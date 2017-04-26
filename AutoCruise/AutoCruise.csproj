@@ -8,8 +8,8 @@
     <ProjectGuid>{435F259E-567C-4324-A389-601DBE452317}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AutoCruise.Main</RootNamespace>
-    <AssemblyName>AutoCruise.Main</AssemblyName>
+    <RootNamespace>AutoCruise</RootNamespace>
+    <AssemblyName>AutoCruise</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -86,7 +86,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ScreenCapture.cs" />
+    <Compile Include="ScreenCapture\GraphicsScreenCapture.cs" />
+    <Compile Include="ScreenCapture\IScreenCapture.cs" />
+    <Compile Include="ScreenCapture\SharpDXScreenCapture.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
