@@ -20,13 +20,16 @@ namespace AutoCruise
         private Thread _cruiseThread;
         private ImageViewer _imageViewer;
 
-        int width = 640;
-        int height = 480;
+        int Width = 640;
+        int Height = 480;
+
+        public Parameters Parameters { get; private set; }
 
         public Cruiser()
         {
+            Parameters = new Parameters() { PerspectiveAmount = 0.86 };
             _cancelToken = new CancellationTokenSource();
-            _imageViewer = new ImageViewer() { Width = width, Height = height };
+            _imageViewer = new ImageViewer() { Width = Width, Height = Height };
         }
 
         public void StartCruising()
@@ -73,47 +76,44 @@ namespace AutoCruise
             using (var screenShot = screenCapture.GetScreenShot())
             {
                 var img = new Image<Rgb, UInt16>(screenShot).Convert<Gray, Byte>();
-                img = ResizeCrop(img);
-                img = img.Copy(new Rectangle(0, 160, width, height - 160 - 120));
-                //img = img.PyrDown().PyrUp();
+
+                img = Perspective(img);
+
+                var x = img.Convert<Gray, float>().Sobel(1, 0, 3);
                 //img = Hough(img);
 
-                _imageViewer.Image = img;
+                _imageViewer.Image = x;
             }
+        }
+
+        private Image<Gray, byte> Perspective(Image<Gray, byte> img)
+        {
+            int bottomWidth = (int)(Width * Parameters.PerspectiveAmount);
+            int bottomHeightIgnore = img.Height / 6;
+            float[,] sourcePoints = { { 0, img.Height / 2 + 10 }, { img.Width, img.Height / 2 + 10 }, { img.Width, img.Height - bottomHeightIgnore }, { 0, img.Height - bottomHeightIgnore } };
+            float[,] destPoints = { { -(bottomWidth / 2), 0 }, { Width + (bottomWidth / 2), 0 }, { Width - (bottomWidth / 2), Height }, { (bottomWidth / 2), Height } };
+            Emgu.CV.Matrix<float> sourceMat = new Matrix<float>(sourcePoints);
+            Emgu.CV.Matrix<float> destMat = new Matrix<float>(destPoints);
+
+            Emgu.CV.Matrix<float> perspMat = new Matrix<float>(3, 3);
+            CvInvoke.FindHomography(sourceMat, destMat, perspMat, Emgu.CV.CvEnum.HomographyMethod.Default, 3.0);
+
+            return img.WarpPerspective(perspMat, Emgu.CV.CvEnum.Inter.Linear, Emgu.CV.CvEnum.Warp.FillOutliers, Emgu.CV.CvEnum.BorderType.Constant, new Gray(0));
         }
 
         private Image<Gray, byte> Hough(Image<Gray, byte> img)
         {
-            return img.Canny(50, 120);
-            //var houghLines = img.HoughLines(40, 60, 4, Math.PI / 180, 3, 30, 3);
-            //foreach(var houghLine in houghLines)
-            //{
-            //    foreach(var segment in houghLine)
-            //    {
-            //        img.Draw(segment, new Gray(255), 3);
-            //    }
-            //}
+            //img = img.PyrDown().PyrUp();
+            img =  img.Canny(80, 120);
+            var houghLines = img.HoughLines(40, 60, 4, Math.PI / 180, 3, 30, 3);
+            foreach (var houghLine in houghLines)
+            {
+                foreach (var segment in houghLine)
+                {
+                    img.Draw(segment, new Gray(255), 3);
+                }
+            }
             return img;
-        }
-
-        private Image<Gray, Byte> ResizeCrop(Image<Gray, Byte> img)
-        {
-            int ratio = img.Width * 100 / img.Height;
-            int newWidth = width;
-            int newHeight = height;
-
-            if (ratio > (width * 100 / height))
-            {
-                newWidth = height * ratio / 100;
-            }
-            else
-            {
-                newHeight = width * 100 / ratio;
-            }
-
-            img = img.Resize(newWidth, newHeight, Emgu.CV.CvEnum.Inter.Linear);
-
-            return img.Copy(new Rectangle((newWidth - width) / 2, (newHeight - height) / 2, width, height));
         }
 
         public void Dispose()

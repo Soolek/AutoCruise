@@ -17,23 +17,24 @@ namespace AutoCruise
 {
     public partial class MainWindow : Window
     {
-        private Cruiser _cruise;
+        public Cruiser Cruiser { get; private set; }
 
         public MainWindow()
         {
-            InitializeComponent();
+            Cruiser = new Cruiser();
+            this.DataContext = Cruiser;
 
-            _cruise = new Cruiser();
+            InitializeComponent();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _cruise.Dispose();
+            Cruiser.Dispose();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _cruise.StartCruising();
+            Cruiser.StartCruising();
         }
     }
 }
