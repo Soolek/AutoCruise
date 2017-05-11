@@ -80,16 +80,18 @@ namespace AutoCruise
         {
             using (var screenShot = screenCapture.GetScreenShot())
             {
-                var img = new Image<Rgb, UInt16>(screenShot).Convert<Gray, Byte>();
+                var imgRgb = new Image<Rgb, UInt16>(screenShot);
+                imgRgb = MakeGreenToBlack(imgRgb);
+                var img = imgRgb.Convert<Gray, Byte>();
                 img = img.Resize(Width, Height, Emgu.CV.CvEnum.Inter.Linear);
                 img = Perspective(img);
+                //TODO: warp curve the image to straight it out (use data from previous run)
                 var perspectiveImg = img.Copy();
                 img = img.Convert<Gray, float>().Sobel(1, 0, 1).Convert<Gray, Byte>();
                 img = FilterOutSobel(img, perspectiveImg);
                 img = FilterPixelClusters(img);
                 img = MarkLanes(img);
 
-                //img = Hough(img);
                 _imageViewer.Image = img;
             }
         }
@@ -332,19 +334,30 @@ namespace AutoCruise
             return img.WarpPerspective(perspMat, Emgu.CV.CvEnum.Inter.Linear, Emgu.CV.CvEnum.Warp.FillOutliers, Emgu.CV.CvEnum.BorderType.Constant, new Gray(0));
         }
 
-        private Image<Gray, byte> Hough(Image<Gray, byte> img)
+        private Image<Rgb, ushort> MakeGreenToBlack(Image<Rgb, ushort> imgRgb)
         {
-            //img = img.PyrDown().PyrUp();
-            img = img.Canny(80, 120);
-            var houghLines = img.HoughLines(40, 60, 4, Math.PI / 180, 3, 30, 3);
-            foreach (var houghLine in houghLines)
-            {
-                foreach (var segment in houghLine)
+            var data = imgRgb.Data;
+            var rows = imgRgb.Rows;
+            var cols = imgRgb.Cols;
+
+            for (int y = rows - 1; y >= 0; y--)
+                for (int x = cols - 1; x >= 0; x--)
                 {
-                    img.Draw(segment, new Gray(255), 3);
+                    var greenish = (data[y, x, 1] - data[y, x, 0]) + (data[y, x, 1] - data[y, x, 2]);
+                    if (greenish > 0)
+                    {
+                        var green = (int)data[y, x, 1] - greenish;
+                        data[y, x, 1] = green < 0 ? (ushort)0 :
+                            green > byte.MaxValue ? (ushort)byte.MaxValue :
+                            (ushort)green;
+
+                        double invGreenIntensity = 1.0 - ((double)greenish / (2 * byte.MaxValue));
+                        data[y, x, 0] = (byte)(data[y, x, 0] * invGreenIntensity * invGreenIntensity);
+                        data[y, x, 2] = (byte)(data[y, x, 2] * invGreenIntensity * invGreenIntensity);
+                    }
                 }
-            }
-            return img;
+
+            return imgRgb;
         }
 
         public void Dispose()
