@@ -17,6 +17,11 @@
                 <xctk:DoubleUpDown Increment="1" Value="{Binding Parameters.SobelAvgOutFilter, Mode=TwoWay}" Height="20"/>
             </StackPanel>
 
+            <StackPanel Orientation="Horizontal">
+                <Label Content="MinClusterHeight"/>
+                <xctk:DoubleUpDown Increment="1" Value="{Binding Parameters.MinClusterHeight, Mode=TwoWay}" Height="20"/>
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </Window>

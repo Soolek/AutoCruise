@@ -46,5 +46,19 @@ namespace AutoCruise
                 SetValue(SobelAvgOutFilterProperty, value);
             }
         }
+
+        public static readonly DependencyProperty MinClusterHeightProperty =
+            DependencyProperty.Register("MinClusterHeight", typeof(int), typeof(Parameters));
+        public int MinClusterHeight
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (int)GetValue(MinClusterHeightProperty));
+            }
+            set
+            {
+                SetValue(MinClusterHeightProperty, value);
+            }
+        }
     }
 }
