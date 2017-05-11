@@ -32,5 +32,19 @@ namespace AutoCruise
                 SetValue(PerspectiveAmountProperty, perspectiveAmount);
             }
         }
+
+        public static readonly DependencyProperty SobelAvgOutFilterProperty =
+            DependencyProperty.Register("SobelAvgOutFilter", typeof(int), typeof(Parameters));
+        public int SobelAvgOutFilter
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (int)GetValue(SobelAvgOutFilterProperty));
+            }
+            set
+            {
+                SetValue(SobelAvgOutFilterProperty, value);
+            }
+        }
     }
 }
