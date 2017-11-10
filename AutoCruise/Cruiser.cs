@@ -11,6 +11,7 @@ using Emgu.CV.UI;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
+using AutoCruise.Control;
 
 namespace AutoCruise
 {
@@ -31,7 +32,8 @@ namespace AutoCruise
             {
                 PerspectiveAmount = 0.81,
                 SobelAvgOutFilter = 9,
-                MinClusterHeight = 12
+                MinClusterHeight = 12,
+                Steering = 0
             };
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
@@ -50,11 +52,12 @@ namespace AutoCruise
             _cruiseThread = new Thread(() =>
                 {
                     var screenCapture = new GraphicsScreenCapture();
+                    var control = new KeyPressEmulator();
                     try
                     {
                         while (!_cancelToken.IsCancellationRequested)
                         {
-                            Work(screenCapture);
+                            Work(screenCapture, control);
                             frameCounter++;
                             if ((DateTime.Now - time).TotalSeconds > 1)
                             {
@@ -71,15 +74,19 @@ namespace AutoCruise
                     finally
                     {
                         screenCapture.Dispose();
+                        control.Dispose();
                     }
                 });
             _cruiseThread.Start();
         }
 
-        private void Work(IScreenCapture screenCapture)
+        private void Work(IScreenCapture screenCapture, IControl control)
         {
             using (var screenShot = screenCapture.GetScreenShot())
             {
+                List<System.Drawing.Point> leftPoints, rightPoints;
+
+                //IMAGE PROCESSING
                 var imgRgb = new Image<Rgb, UInt16>(screenShot);
                 imgRgb = MakeGreenToBlack(imgRgb);
                 var img = imgRgb.Convert<Gray, Byte>();
@@ -90,16 +97,45 @@ namespace AutoCruise
                 img = img.Convert<Gray, float>().Sobel(1, 0, 1).Convert<Gray, Byte>();
                 img = FilterOutSobel(img, perspectiveImg);
                 img = FilterPixelClusters(img);
-                img = MarkLanes(img);
+                img = MarkLanes(img, out leftPoints, out rightPoints);
 
                 _imageViewer.Image = img;
+
+                //CONTROL
+                float steering = 0;
+
+                //steer to center of lane
+                int maxYpoints = 5;
+                float laneSteering = 0;
+                for (int y = 2; y <= maxYpoints; y++)
+                {
+                    var laneCenterOffset = (rightPoints[0].X - Width / 2) - (Width / 2 - leftPoints[0].X);
+                    laneSteering += (float)laneCenterOffset / (Width / 2);
+                }
+                laneSteering /= maxYpoints;
+                steering += laneSteering;
+
+                //steer parallel to lane
+                float directionSteering =
+                    (rightPoints[5].X - rightPoints[2].X) * 1.0f / (rightPoints[2].Y - rightPoints[5].Y)
+                    + (leftPoints[5].X - leftPoints[2].X) * 1.0f / (leftPoints[2].Y - leftPoints[5].Y);
+                steering += directionSteering;
+
+                Parameters.Steering = steering;
+
+                if (Math.Abs(steering) > 0.2)
+                    control.SetLateral((float)steering);
+                else
+                    control.SetLateral(0);
             }
         }
 
         private int laneWindowWidth = 40;
         private int laneWindowHeight = 20;
-        private Image<Gray, byte> MarkLanes(Image<Gray, byte> img)
+        private Image<Gray, byte> MarkLanes(Image<Gray, byte> img, out List<System.Drawing.Point> leftPoints, out List<System.Drawing.Point> rightPoints)
         {
+            leftPoints = new List<System.Drawing.Point>();
+            rightPoints = new List<System.Drawing.Point>();
             Tuple<int, int> laneHorizCenters = EstimateLaneHorizCenters(img);
             var data = img.Data;
 
@@ -134,6 +170,9 @@ namespace AutoCruise
                     data[y - laneWindowHeight / 2, windowMeanLeftX + x, 0] = 255;
                     data[y - laneWindowHeight / 2, windowMeanRightX + x, 0] = 255;
                 }
+
+                leftPoints.Add(new System.Drawing.Point(windowMeanLeftX, y));
+                rightPoints.Add(new System.Drawing.Point(windowMeanRightX, y));
             }
 
             return img;

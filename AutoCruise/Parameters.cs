@@ -60,5 +60,19 @@ namespace AutoCruise
                 SetValue(MinClusterHeightProperty, value);
             }
         }
+
+        public static readonly DependencyProperty SteeringProperty =
+            DependencyProperty.Register("Steering", typeof(float), typeof(Parameters));
+        public float Steering
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(SteeringProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(SteeringProperty, value));
+            }
+        }
     }
 }
