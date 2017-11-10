@@ -26,7 +26,12 @@
                 <Label Content="Steering"/>
                 <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.Steering, Mode=TwoWay}" Height="20"/>
             </StackPanel>
-            
+
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Speed"/>
+                <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.Speed, Mode=TwoWay}" Height="20"/>
+            </StackPanel>
+
         </StackPanel>
     </Grid>
 </Window>

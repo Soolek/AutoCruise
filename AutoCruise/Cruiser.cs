@@ -12,6 +12,7 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
 using AutoCruise.Control;
+using InSimDotNet.Out;
 
 namespace AutoCruise
 {
@@ -53,6 +54,9 @@ namespace AutoCruise
                 {
                     var screenCapture = new GraphicsScreenCapture();
                     var control = new KeyPressEmulator();
+                    OutGauge outGauge = new OutGauge();
+                    outGauge.Connect("127.0.0.1", 666);
+                    outGauge.PacketReceived += OutGauge_PacketReceived;
                     try
                     {
                         while (!_cancelToken.IsCancellationRequested)
@@ -75,9 +79,16 @@ namespace AutoCruise
                     {
                         screenCapture.Dispose();
                         control.Dispose();
+                        outGauge.Disconnect();
+                        outGauge.Dispose();
                     }
                 });
             _cruiseThread.Start();
+        }
+
+        private void OutGauge_PacketReceived(object sender, OutGaugeEventArgs e)
+        {
+            Parameters.Speed = e.Speed;
         }
 
         private void Work(IScreenCapture screenCapture, IControl control)
@@ -127,6 +138,14 @@ namespace AutoCruise
                     control.SetLateral((float)steering);
                 else
                     control.SetLateral(0);
+
+                float desiredSpeed = 4 - Math.Abs(steering);
+                float speedTreshold = 1;
+
+                if (Math.Abs(Parameters.Speed - desiredSpeed) > speedTreshold)
+                    control.SetLongitudal(Math.Sign(desiredSpeed - Parameters.Speed));
+                else
+                    control.SetLongitudal(0);
             }
         }
 

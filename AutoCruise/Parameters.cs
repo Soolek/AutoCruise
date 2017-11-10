@@ -74,5 +74,19 @@ namespace AutoCruise
                 this.Dispatcher.Invoke(() => SetValue(SteeringProperty, value));
             }
         }
+
+        public static readonly DependencyProperty SpeedProperty =
+            DependencyProperty.Register("Speed", typeof(float), typeof(Parameters));
+        public float Speed
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(SpeedProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(SpeedProperty, value));
+            }
+        }
     }
 }
