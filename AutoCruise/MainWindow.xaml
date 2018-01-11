@@ -11,7 +11,7 @@
                 <Label Content="AutoDrive"/>
                 <CheckBox IsChecked="{Binding Parameters.AutoDrive, Mode=TwoWay}" VerticalAlignment="Center"/>
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal">
                 <Label Content="Perspective"/>
                 <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.PerspectiveAmount, Mode=TwoWay}" Height="20"/>
@@ -29,12 +29,18 @@
 
             <StackPanel Orientation="Horizontal">
                 <Label Content="Steering"/>
-                <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.Steering, Mode=TwoWay}" Height="20"/>
+                <TextBox Text="{Binding Parameters.Steering, Mode=OneWay, StringFormat={}{0:0.00}}" Height="20" Width="50"/>
+                <StackPanel Orientation="Horizontal" Width="80" Background="LightGray">
+                    <Button Background="Red" Margin="{Binding Parameters.SteeringForGui, Mode=OneWay}"/>
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
                 <Label Content="Speed"/>
-                <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.Speed, Mode=TwoWay}" Height="20"/>
+                <TextBox Text="{Binding Parameters.Speed, Mode=OneWay, StringFormat={}{0:0.00}}" Height="20" Width="50"/>
+                <StackPanel Orientation="Horizontal" Width="80" Background="LightGray">
+                    <Button Background="Blue" Width="{Binding Parameters.SpeedForGui, Mode=OneWay}"/>
+                </StackPanel>
             </StackPanel>
 
         </StackPanel>

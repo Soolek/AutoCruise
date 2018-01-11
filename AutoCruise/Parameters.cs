@@ -72,6 +72,21 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(SteeringProperty, value));
+                SteeringForGui = new Thickness((value + 1f) * 40f, 0, 0, 0);
+            }
+        }
+
+        public static readonly DependencyProperty SteeringForGuiProperty =
+            DependencyProperty.Register("SteeringForGui", typeof(Thickness), typeof(Parameters));
+        public Thickness SteeringForGui
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (Thickness)GetValue(SteeringForGuiProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(SteeringForGuiProperty, value));
             }
         }
 
@@ -86,6 +101,29 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(SpeedProperty, value));
+                SpeedForGui = value;
+            }
+        }
+
+        private static float _maxSpeed = 0;
+        public static readonly DependencyProperty SpeedForGuiProperty =
+            DependencyProperty.Register("SpeedForGui", typeof(float), typeof(Parameters));
+        public float SpeedForGui
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(SpeedForGuiProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    if (value > _maxSpeed)
+                    {
+                        _maxSpeed = value;
+                    }
+                    SetValue(SpeedForGuiProperty, value/_maxSpeed*80f);
+                });
             }
         }
 

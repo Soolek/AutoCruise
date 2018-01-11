@@ -144,8 +144,8 @@ namespace AutoCruise
                         control.SetLateral(0);
 
                     //float desiredSpeed = 5 - 2 * Math.Abs(steering);
-                    float desiredSpeed = 4 - Math.Abs(steering) + (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
-                    float speedTreshold = 1f;
+                    float desiredSpeed = 4 + (1f - Math.Abs(steering)) * 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                    float speedTreshold = 0.75f;
 
                     if (Math.Abs(Parameters.Speed - desiredSpeed) > speedTreshold)
                         control.SetLongitudal(Math.Sign(desiredSpeed - Parameters.Speed));
@@ -173,7 +173,7 @@ namespace AutoCruise
                 sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
             }
 
-            float laneCurvative = Math.Min(1f, sumOfDifferences / 30f);
+            float laneCurvative = Math.Min(1f, sumOfDifferences / 40f);
             return 1f - laneCurvative;
         }
 
