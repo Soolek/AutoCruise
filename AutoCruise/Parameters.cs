@@ -88,5 +88,19 @@ namespace AutoCruise
                 this.Dispatcher.Invoke(() => SetValue(SpeedProperty, value));
             }
         }
+
+        public static readonly DependencyProperty AutoDriveProperty =
+            DependencyProperty.Register("AutoDrive", typeof(bool), typeof(Parameters));
+        public bool AutoDrive
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (bool)GetValue(AutoDriveProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(AutoDriveProperty, value));
+            }
+        }
     }
 }

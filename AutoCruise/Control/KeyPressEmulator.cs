@@ -30,6 +30,12 @@ namespace AutoCruise.Control
             _gamehWnd = FindWindow(null, "Live for Speed");
         }
 
+        public void Reset()
+        {
+            _lastLongitudal = 0;
+            _lastLateral = 0;
+        }
+
         private float _lastLongitudal = 0;
         public void SetLongitudal(float longitudal)
         {

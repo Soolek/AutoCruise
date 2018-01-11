@@ -5,8 +5,13 @@
         Title="MainWindow" Height="350" Width="525" Closing="Window_Closing">
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
-            <Button Width="200" Height="30" Content="Start Crusing!" Click="Button_Click"></Button>
+            <Button Width="200" Height="30" Content="Start" Click="Button_Click"></Button>
 
+            <StackPanel Orientation="Horizontal">
+                <Label Content="AutoDrive"/>
+                <CheckBox IsChecked="{Binding Parameters.AutoDrive, Mode=TwoWay}" VerticalAlignment="Center"/>
+            </StackPanel>
+            
             <StackPanel Orientation="Horizontal">
                 <Label Content="Perspective"/>
                 <xctk:DoubleUpDown Increment=".01" Value="{Binding Parameters.PerspectiveAmount, Mode=TwoWay}" Height="20"/>

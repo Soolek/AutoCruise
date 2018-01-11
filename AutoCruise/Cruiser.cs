@@ -31,16 +31,17 @@ namespace AutoCruise
         {
             Parameters = new Parameters()
             {
-                PerspectiveAmount = 0.81,
-                SobelAvgOutFilter = 9,
-                MinClusterHeight = 12,
+                AutoDrive = false,
+                PerspectiveAmount = 0.83,
+                SobelAvgOutFilter = 8,
+                MinClusterHeight = 10,
                 Steering = 0
             };
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
         }
 
-        public void StartCruising()
+        public void Start()
         {
             _imageViewer.Show();
             DateTime time = DateTime.Now;
@@ -113,40 +114,67 @@ namespace AutoCruise
                 _imageViewer.Image = img;
 
                 //CONTROL
+
                 float steering = 0;
 
                 //steer to center of lane
                 int maxYpoints = 5;
                 float laneSteering = 0;
-                for (int y = 2; y <= maxYpoints; y++)
+                for (int y = 1; y <= maxYpoints; y++)
                 {
-                    var laneCenterOffset = (rightPoints[0].X - Width / 2) - (Width / 2 - leftPoints[0].X);
-                    laneSteering += (float)laneCenterOffset / (Width / 2);
+                    var laneCenterOffset = leftPoints[y].X + rightPoints[y].X - Width;
+                    laneSteering += (float)laneCenterOffset * 3 / Width;
                 }
                 laneSteering /= maxYpoints;
                 steering += laneSteering;
 
                 //steer parallel to lane
                 float directionSteering =
-                    (rightPoints[5].X - rightPoints[2].X) * 1.0f / (rightPoints[2].Y - rightPoints[5].Y)
-                    + (leftPoints[5].X - leftPoints[2].X) * 1.0f / (leftPoints[2].Y - leftPoints[5].Y);
-                steering += directionSteering;
+                    (rightPoints[5].X - rightPoints[1].X) * 1.0f / (rightPoints[1].Y - rightPoints[5].Y)
+                    + (leftPoints[5].X - leftPoints[1].X) * 1.0f / (leftPoints[1].Y - leftPoints[5].Y);
+                steering += directionSteering / 2f;
 
                 Parameters.Steering = steering;
 
-                if (Math.Abs(steering) > 0.2)
-                    control.SetLateral((float)steering);
-                else
-                    control.SetLateral(0);
+                if (Parameters.AutoDrive)
+                {
+                    if (Math.Abs(steering) > 0.3)
+                        control.SetLateral((float)steering);
+                    else
+                        control.SetLateral(0);
 
-                float desiredSpeed = 4 - Math.Abs(steering);
-                float speedTreshold = 1;
+                    //float desiredSpeed = 5 - 2 * Math.Abs(steering);
+                    float desiredSpeed = 4 - Math.Abs(steering) + (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                    float speedTreshold = 1f;
 
-                if (Math.Abs(Parameters.Speed - desiredSpeed) > speedTreshold)
-                    control.SetLongitudal(Math.Sign(desiredSpeed - Parameters.Speed));
+                    if (Math.Abs(Parameters.Speed - desiredSpeed) > speedTreshold)
+                        control.SetLongitudal(Math.Sign(desiredSpeed - Parameters.Speed));
+                    else
+                        control.SetLongitudal(0);
+                }
                 else
-                    control.SetLongitudal(0);
+                {
+                    control.Reset();
+                }
             }
+        }
+
+        private float LaneStraightness(List<System.Drawing.Point> lanePoints)
+        {
+            var xsToCompare = lanePoints
+                            .Skip(1)
+                            .Take(8)
+                            .Select(p => p.X)
+                            .ToArray();
+
+            int sumOfDifferences = 0;
+            for (int i = 1; i < xsToCompare.Length; i++)
+            {
+                sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
+            }
+
+            float laneCurvative = Math.Min(1f, sumOfDifferences / 30f);
+            return 1f - laneCurvative;
         }
 
         private int laneWindowWidth = 40;

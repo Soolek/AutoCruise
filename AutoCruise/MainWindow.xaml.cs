@@ -34,7 +34,7 @@ namespace AutoCruise
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Cruiser.StartCruising();
+            Cruiser.Start();
         }
     }
 }

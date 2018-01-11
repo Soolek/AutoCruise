@@ -8,6 +8,7 @@ namespace AutoCruise.Control
 {
     public interface IControl
     {
+        void Reset();
         void SetLongitudal(float longitudal);
         void SetLateral(float lateral);
     }
