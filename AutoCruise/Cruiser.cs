@@ -14,6 +14,8 @@ using System.Drawing;
 using AutoCruise.Control;
 using InSimDotNet.Out;
 
+using vJoyInterfaceWrap;
+
 namespace AutoCruise
 {
     public class Cruiser : IDisposable
@@ -26,6 +28,7 @@ namespace AutoCruise
         int Height = 480;
 
         public Parameters Parameters { get; private set; }
+        public IControl Control { get; private set; }
 
         public Cruiser()
         {
@@ -37,6 +40,8 @@ namespace AutoCruise
                 MinClusterHeight = 10,
                 Steering = 0
             };
+            Control = new KeyPressEmulator();
+
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
         }
@@ -54,7 +59,6 @@ namespace AutoCruise
             _cruiseThread = new Thread(() =>
                 {
                     var screenCapture = new GraphicsScreenCapture();
-                    var control = new KeyPressEmulator();
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
                     outGauge.PacketReceived += OutGauge_PacketReceived;
@@ -62,7 +66,7 @@ namespace AutoCruise
                     {
                         while (!_cancelToken.IsCancellationRequested)
                         {
-                            Work(screenCapture, control);
+                            Work(screenCapture, Control);
                             frameCounter++;
                             if ((DateTime.Now - time).TotalSeconds > 1)
                             {
@@ -79,7 +83,7 @@ namespace AutoCruise
                     finally
                     {
                         screenCapture.Dispose();
-                        control.Dispose();
+                        Control.Dispose();
                         outGauge.Disconnect();
                         outGauge.Dispose();
                     }
@@ -108,7 +112,7 @@ namespace AutoCruise
 
                 img = Perspective(img);
                 ShowSelectedImage(img, imageStep++);
-                
+
                 //TODO: warp curve the image to straight it out (use data from previous run)
 
                 var perspectiveImg = img.Copy();
@@ -149,19 +153,10 @@ namespace AutoCruise
 
                 if (Parameters.AutoDrive)
                 {
-                    if (Math.Abs(steering) > 0.3)
-                        control.SetLateral((float)steering);
-                    else
-                        control.SetLateral(0);
+                    control.SetLateral((float)steering);
 
-                    //float desiredSpeed = 5 - 2 * Math.Abs(steering);
                     float desiredSpeed = 4 + (1f - Math.Abs(steering)) * 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
-                    float speedTreshold = 0.75f;
-
-                    if (Math.Abs(Parameters.Speed - desiredSpeed) > speedTreshold)
-                        control.SetLongitudal(Math.Sign(desiredSpeed - Parameters.Speed));
-                    else
-                        control.SetLongitudal(0);
+                    control.SetLongitudal(Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed)));
                 }
                 else
                 {

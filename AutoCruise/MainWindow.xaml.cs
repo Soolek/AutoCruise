@@ -26,8 +26,30 @@ namespace AutoCruise
             this.DataContext = Cruiser;
 
             this.KeyUp += MainWindow_KeyUp;
+            this.KeyDown += MainWindow_KeyDown;
 
             InitializeComponent();
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.J)
+            {
+                Cruiser.Control.SetLateral(-1);
+            }
+            else if (e.Key == Key.L)
+            {
+                Cruiser.Control.SetLateral(1);
+            }
+
+            if (e.Key == Key.I)
+            {
+                Cruiser.Control.SetLongitudal(1);
+            }
+            else if (e.Key == Key.K)
+            {
+                Cruiser.Control.SetLongitudal(-1);
+            }
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
@@ -36,13 +58,23 @@ namespace AutoCruise
             {
                 Cruiser.Parameters.AutoDrive = !Cruiser.Parameters.AutoDrive;
             }
-            else if (e.Key == Key.Z)
+            if (e.Key == Key.Z)
             {
                 Cruiser.Parameters.ImageStep--;
             }
-            else if (e.Key == Key.X)
+            if (e.Key == Key.X)
             {
                 Cruiser.Parameters.ImageStep++;
+            }
+
+            if (e.Key == Key.J || e.Key == Key.L)
+            {
+                Cruiser.Control.SetLateral(0);
+            }
+
+            if (e.Key == Key.I || e.Key == Key.K)
+            {
+                Cruiser.Control.SetLongitudal(0);
             }
         }
 
