@@ -97,21 +97,32 @@ namespace AutoCruise
             using (var screenShot = screenCapture.GetScreenShot())
             {
                 List<System.Drawing.Point> leftPoints, rightPoints;
+                int imageStep = 0;
 
                 //IMAGE PROCESSING
                 var imgRgb = new Image<Rgb, UInt16>(screenShot);
                 imgRgb = MakeGreenToBlack(imgRgb);
                 var img = imgRgb.Convert<Gray, Byte>();
                 img = img.Resize(Width, Height, Emgu.CV.CvEnum.Inter.Linear);
+                ShowSelectedImage(img, imageStep++);
+
                 img = Perspective(img);
+                ShowSelectedImage(img, imageStep++);
+                
                 //TODO: warp curve the image to straight it out (use data from previous run)
+
                 var perspectiveImg = img.Copy();
                 img = img.Convert<Gray, float>().Sobel(1, 0, 1).Convert<Gray, Byte>();
-                img = FilterOutSobel(img, perspectiveImg);
-                img = FilterPixelClusters(img);
-                img = MarkLanes(img, out leftPoints, out rightPoints);
+                ShowSelectedImage(img, imageStep++);
 
-                _imageViewer.Image = img;
+                img = FilterOutSobel(img, perspectiveImg);
+                ShowSelectedImage(img, imageStep++);
+
+                img = FilterPixelClusters(img);
+                ShowSelectedImage(img, imageStep++);
+
+                img = MarkLanes(img, out leftPoints, out rightPoints);
+                ShowSelectedImage(img, imageStep++);
 
                 //CONTROL
 
@@ -156,6 +167,14 @@ namespace AutoCruise
                 {
                     control.Reset();
                 }
+            }
+        }
+
+        private void ShowSelectedImage(Image<Gray, byte> img, int imageStep)
+        {
+            if (imageStep == Parameters.ImageStep)
+            {
+                _imageViewer.Image = img.Clone();
             }
         }
 

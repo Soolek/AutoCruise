@@ -128,6 +128,7 @@
     </ApplicationDefinition>
     <Compile Include="Control\IControl.cs" />
     <Compile Include="Control\KeyPressEmulator.cs" />
+    <Compile Include="Helpers\ActionCommand.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="ScreenCapture\GraphicsScreenCapture.cs" />
     <Compile Include="ScreenCapture\IScreenCapture.cs" />
@@ -172,7 +173,9 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="todo.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

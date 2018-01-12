@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using AutoCruise.Helpers;
 
 namespace AutoCruise
 {
@@ -24,7 +25,25 @@ namespace AutoCruise
             Cruiser = new Cruiser();
             this.DataContext = Cruiser;
 
+            this.KeyUp += MainWindow_KeyUp;
+
             InitializeComponent();
+        }
+
+        private void MainWindow_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.A)
+            {
+                Cruiser.Parameters.AutoDrive = !Cruiser.Parameters.AutoDrive;
+            }
+            else if (e.Key == Key.Z)
+            {
+                Cruiser.Parameters.ImageStep--;
+            }
+            else if (e.Key == Key.X)
+            {
+                Cruiser.Parameters.ImageStep++;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

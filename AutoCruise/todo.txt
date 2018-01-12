@@ -1,0 +1,1 @@
+﻿- vJoy, jego implementacja jako IControl oraz moduł do ustawiania LFS

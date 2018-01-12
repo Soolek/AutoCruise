@@ -72,7 +72,7 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(SteeringProperty, value));
-                SteeringForGui = new Thickness((value + 1f) * 40f, 0, 0, 0);
+                SteeringForGui = new Thickness((value + 1f) * 40f - 3f, 0, 0, 0);
             }
         }
 
@@ -138,6 +138,25 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(AutoDriveProperty, value));
+            }
+        }
+
+        public static readonly DependencyProperty ImageStepProperty =
+            DependencyProperty.Register("ImageStep", typeof(int), typeof(Parameters));
+        public int ImageStep
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (int)GetValue(ImageStepProperty));
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                SetValue(ImageStepProperty, value);
             }
         }
     }
