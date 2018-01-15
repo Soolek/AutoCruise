@@ -35,7 +35,7 @@ namespace AutoCruise
             Parameters = new Parameters()
             {
                 AutoDrive = false,
-                PerspectiveAmount = 0.83,
+                PerspectiveAmount = 0.82,
                 SobelAvgOutFilter = 8,
                 MinClusterHeight = 10,
                 Steering = 0
@@ -164,8 +164,7 @@ namespace AutoCruise
                 {
                     control.SetLateral((float)steering);
 
-                    float desiredSpeed = 4 + (1f - Math.Abs(steering)) * 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
-                    //float desiredSpeed = 4 + 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                    float desiredSpeed = 5 + 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
                     control.SetLongitudal(Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed)));
                 }
                 else
@@ -197,7 +196,7 @@ namespace AutoCruise
                 sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
             }
 
-            float laneCurvative = Math.Min(1f, sumOfDifferences / 100f);
+            float laneCurvative = Math.Min(1f, sumOfDifferences / 50f);
             return 1f - laneCurvative;
         }
 
@@ -222,16 +221,35 @@ namespace AutoCruise
             for (int y = img.Rows - 1; y > laneWindowHeight; y -= laneWindowHeight)
             {
                 //find mean of a left window
-                windowMeanLeftX = FindWindowMeanX(img,
+                var leftX = FindWindowMeanX(img,
                     new System.Drawing.Point(windowMeanLeftX - laneWindowWidth / 2, y - laneWindowHeight),
                     laneWindowWidth, laneWindowHeight);
+                if (leftX == -1)
+                {
+                    windowMeanLeftX = UsePreviousPoints(windowMeanLeftX, leftPoints);
+                }
+                else
+                {
+                    windowMeanLeftX = leftX;
+                }
+
                 windowMeanLeftX = windowMeanLeftX < laneWindowWidth / 2 ? laneWindowWidth / 2 :
                     windowMeanLeftX > (Width - laneWindowWidth / 2) ? (Width - laneWindowWidth / 2) :
                     windowMeanLeftX;
+
                 //find mean of a right window
-                windowMeanRightX = FindWindowMeanX(img,
+                var rightX = FindWindowMeanX(img,
                     new System.Drawing.Point(windowMeanRightX - laneWindowWidth / 2, y - laneWindowHeight),
                     laneWindowWidth, laneWindowHeight);
+                if (rightX == -1)
+                {
+                    windowMeanRightX = UsePreviousPoints(windowMeanRightX, rightPoints);
+                }
+                else
+                {
+                    windowMeanRightX = rightX;
+                }
+
                 windowMeanRightX = windowMeanRightX < laneWindowWidth / 2 ? laneWindowWidth / 2 :
                     windowMeanRightX > (Width - laneWindowWidth / 2) ? (Width - laneWindowWidth / 2) :
                     windowMeanRightX;
@@ -249,6 +267,16 @@ namespace AutoCruise
             return img;
         }
 
+        private int UsePreviousPoints(int foundX, List<System.Drawing.Point> prevPoints)
+        {
+            if (prevPoints.Count < 2)
+            {
+                return foundX;
+            }
+
+            return 2 * prevPoints[prevPoints.Count - 1].X - prevPoints[prevPoints.Count - 2].X;
+        }
+
         private int FindWindowMeanX(Image<Gray, byte> img, System.Drawing.Point topLeft, int windowWidth, int windowHeight)
         {
             var data = img.Data;
@@ -264,7 +292,8 @@ namespace AutoCruise
                 }
 
             if (weightedSum == 0)
-                return topLeft.X + windowWidth / 2;
+                //return topLeft.X + windowWidth / 2;
+                return -1;
 
             return topLeft.X + (int)Math.Round(weightedIndexSum * 1.0 / weightedSum);
         }
