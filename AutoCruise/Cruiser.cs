@@ -40,7 +40,16 @@ namespace AutoCruise
                 MinClusterHeight = 10,
                 Steering = 0
             };
-            Control = new KeyPressEmulator();
+            try
+            {
+                Control = new VJoyControl();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ", switching to keyboard control");
+                Control = new KeyPressEmulator();
+            }
+
 
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
@@ -156,11 +165,12 @@ namespace AutoCruise
                     control.SetLateral((float)steering);
 
                     float desiredSpeed = 4 + (1f - Math.Abs(steering)) * 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                    //float desiredSpeed = 4 + 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
                     control.SetLongitudal(Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed)));
                 }
                 else
                 {
-                    control.Reset();
+                    //control.Reset();
                 }
             }
         }
@@ -187,7 +197,7 @@ namespace AutoCruise
                 sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
             }
 
-            float laneCurvative = Math.Min(1f, sumOfDifferences / 40f);
+            float laneCurvative = Math.Min(1f, sumOfDifferences / 100f);
             return 1f - laneCurvative;
         }
 
