@@ -11,5 +11,8 @@ namespace AutoCruise.Control
         void Reset();
         void SetLongitudal(float longitudal);
         void SetLateral(float lateral);
+        void ShiftUp();
+        void ShiftDown();
+        void Ignition();
     }
 }

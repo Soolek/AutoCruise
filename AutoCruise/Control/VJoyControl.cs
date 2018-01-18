@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using vJoyInterfaceWrap;
@@ -83,5 +84,31 @@ namespace AutoCruise.Control
         {
             joy.RelinquishVJD(id);
         }
+
+        public void ShiftUp()
+        {
+            PressBtn(1);
+        }
+
+        public void ShiftDown()
+        {
+            PressBtn(2);
+        }
+
+        public void Ignition()
+        {
+            PressBtn(3);
+        }
+
+        private void PressBtn(uint keyId)
+        {
+            new Task(() =>
+            {
+                joy.SetBtn(true, id, keyId);
+                Thread.Sleep(50);
+                joy.SetBtn(false, id, keyId);
+            }).Start();
+        }
+
     }
 }

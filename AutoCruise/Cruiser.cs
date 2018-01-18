@@ -164,7 +164,7 @@ namespace AutoCruise
                 {
                     control.SetLateral((float)steering);
 
-                    float desiredSpeed = 5 + 5f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                    float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
                     control.SetLongitudal(Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed)));
                 }
                 else
@@ -182,11 +182,12 @@ namespace AutoCruise
             }
         }
 
+        private float maxSumOfDifferences = 50;
         private float LaneStraightness(List<System.Drawing.Point> lanePoints)
         {
             var xsToCompare = lanePoints
-                            .Skip(1)
-                            .Take(8)
+                            //.Skip(1)
+                            .Take(12)
                             .Select(p => p.X)
                             .ToArray();
 
@@ -196,7 +197,9 @@ namespace AutoCruise
                 sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
             }
 
-            float laneCurvative = Math.Min(1f, sumOfDifferences / 50f);
+            maxSumOfDifferences = sumOfDifferences > maxSumOfDifferences ? sumOfDifferences : maxSumOfDifferences;
+
+            float laneCurvative = Math.Min(1f, sumOfDifferences / maxSumOfDifferences);
             return 1f - laneCurvative;
         }
 

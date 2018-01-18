@@ -89,5 +89,20 @@ namespace AutoCruise.Control
             PostMessage(_gamehWnd, WM_KEYUP, VK_RIGHT, 0);
             PostMessage(_gamehWnd, WM_KEYUP, VK_DOWN, 0);
         }
+
+        public void ShiftUp()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ShiftDown()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Ignition()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

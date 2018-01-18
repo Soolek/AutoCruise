@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using AutoCruise.Helpers;
+using AutoCruise.Control;
 
 namespace AutoCruise
 {
@@ -57,6 +58,11 @@ namespace AutoCruise
             if (e.Key == Key.A)
             {
                 Cruiser.Parameters.AutoDrive = !Cruiser.Parameters.AutoDrive;
+                if (!Cruiser.Parameters.AutoDrive)
+                {
+                    Cruiser.Control.SetLateral(0);
+                    Cruiser.Control.SetLongitudal(0);
+                }
             }
             if (e.Key == Key.Z)
             {
@@ -75,6 +81,20 @@ namespace AutoCruise
             if (e.Key == Key.I || e.Key == Key.K)
             {
                 Cruiser.Control.SetLongitudal(0);
+            }
+
+            if (e.Key == Key.Y)
+            {
+                Cruiser.Control.ShiftUp();
+            }
+            else if (e.Key == Key.H)
+            {
+                Cruiser.Control.ShiftDown();
+            }
+
+            if (e.Key == Key.U)
+            {
+                Cruiser.Control.Ignition();
             }
         }
 
