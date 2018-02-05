@@ -125,7 +125,7 @@ namespace AutoCruise
                 //TODO: warp curve the image to straight it out (use data from previous run)
 
                 var perspectiveImg = img.Copy();
-                img = img.Convert<Gray, float>().Sobel(1, 0, 1).Convert<Gray, Byte>();
+                img = img.Convert<Gray, float>().Sobel(1, 0, 3).Convert<Gray, Byte>();
                 ShowSelectedImage(img, imageStep++);
 
                 img = FilterOutSobel(img, perspectiveImg);
