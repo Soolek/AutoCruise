@@ -14,7 +14,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <Label Content="Image step"/>
-                <xctk:DoubleUpDown Increment="1" Minimum="0" Value="{Binding Parameters.ImageStep, Mode=TwoWay}" Height="20"/>
+                <xctk:DoubleUpDown Increment="1" Minimum="0" Maximum="{Binding Parameters.MaxImageStep}" Value="{Binding Parameters.ImageStep, Mode=TwoWay}" Height="20"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">

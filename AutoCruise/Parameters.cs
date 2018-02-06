@@ -197,9 +197,14 @@ namespace AutoCruise
                 {
                     value = 0;
                 }
+                else if (value > MaxImageStep)
+                {
+                    value = MaxImageStep;
+                }
 
-                SetValue(ImageStepProperty, value);
+                this.Dispatcher.Invoke(() => SetValue(ImageStepProperty, value));
             }
         }
+        public int MaxImageStep { get; set; }
     }
 }

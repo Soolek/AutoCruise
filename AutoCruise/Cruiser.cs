@@ -36,7 +36,7 @@ namespace AutoCruise
             {
                 AutoDrive = false,
                 PerspectiveAmount = 0.82,
-                SobelAvgOutFilter = 8,
+                SobelAvgOutFilter = 9,
                 MinClusterHeight = 10,
                 Steering = 0
             };
@@ -67,6 +67,7 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
+                    //var screenCapture = new SharpDxScreenCapture();
                     var screenCapture = new GraphicsScreenCapture();
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
@@ -124,6 +125,9 @@ namespace AutoCruise
 
                 //TODO: warp curve the image to straight it out (use data from previous run)
 
+                img = Blur(img);
+                ShowSelectedImage(img, imageStep++);
+
                 var perspectiveImg = img.Copy();
                 img = img.Convert<Gray, float>().Sobel(1, 0, 3).Convert<Gray, Byte>();
                 ShowSelectedImage(img, imageStep++);
@@ -136,6 +140,8 @@ namespace AutoCruise
 
                 img = MarkLanes(img, out leftPoints, out rightPoints);
                 ShowSelectedImage(img, imageStep++);
+
+                Parameters.MaxImageStep = imageStep - 1;
 
                 //CONTROL
 
@@ -293,6 +299,7 @@ namespace AutoCruise
                 for (int x = 0; x < windowWidth; x++)
                 {
                     var val = data[topLeft.Y + y, topLeft.X + x, 0] > 128 ? data[topLeft.Y + y, topLeft.X + x, 0] - 128 : 0;
+                    val *= val;
                     weightedIndexSum += x * val;
                     weightedSum += val;
                 }
@@ -370,7 +377,7 @@ namespace AutoCruise
                 for (var x = width - 1; x >= 0; x--)
                 {
                     int miny = height; int maxy = 0;
-                    RecursiveFindClusterMinMaxY(x, y, width - 1, height - 1, img, ref searchedPixels, ref miny, ref maxy);
+                    RecursiveFindClusterMinMaxY(x, y, width - 2, height - 2, img, ref searchedPixels, ref miny, ref maxy);
                     int clusterHeight = maxy - miny;
 
                     if (clusterHeight >= 0 && clusterHeight < minClusterHeight)
@@ -394,10 +401,11 @@ namespace AutoCruise
                 RecursiveDeleteCluster(x, y - 1, maxXindex, maxYindex, img, recur);
                 RecursiveDeleteCluster(x + 1, y - 1, maxXindex, maxYindex, img, recur);
                 RecursiveDeleteCluster(x - 1, y - 1, maxXindex, maxYindex, img, recur);
+                RecursiveDeleteCluster(x + 1, y, maxXindex, maxYindex, img, recur);
+                RecursiveDeleteCluster(x - 1, y, maxXindex, maxYindex, img, recur);
                 RecursiveDeleteCluster(x + 1, y + 1, maxXindex, maxYindex, img, recur);
                 RecursiveDeleteCluster(x - 1, y + 1, maxXindex, maxYindex, img, recur);
                 RecursiveDeleteCluster(x, y + 1, maxXindex, maxYindex, img, recur);
-
             }
         }
 
@@ -418,6 +426,8 @@ namespace AutoCruise
                     RecursiveFindClusterMinMaxY(x, y - 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
                     RecursiveFindClusterMinMaxY(x + 1, y - 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
                     RecursiveFindClusterMinMaxY(x - 1, y - 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
+                    RecursiveFindClusterMinMaxY(x + 1, y, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
+                    RecursiveFindClusterMinMaxY(x - 1, y, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
                     RecursiveFindClusterMinMaxY(x + 1, y + 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
                     RecursiveFindClusterMinMaxY(x - 1, y + 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
                     RecursiveFindClusterMinMaxY(x, y + 1, maxXindex, maxYindex, img, ref searchedPixels, ref miny, ref maxy, recur);
@@ -452,6 +462,11 @@ namespace AutoCruise
                 }
 
             return img;
+        }
+
+        private Image<Gray, byte> Blur(Image<Gray, byte> img)
+        {
+            return img.SmoothBlur(4, 6);
         }
 
         float[,] GetROI()
