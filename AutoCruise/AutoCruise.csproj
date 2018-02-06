@@ -141,6 +141,7 @@
     <Compile Include="Control\VJoyControl.cs" />
     <Compile Include="Control\KeyPressEmulator.cs" />
     <Compile Include="Helpers\ActionCommand.cs" />
+    <Compile Include="Lib\LogitechGSDK.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="ScreenCapture\SharpDxScreenCapture.cs" />
     <Compile Include="ScreenCapture\GraphicsScreenCapture.cs" />
@@ -192,6 +193,9 @@
   <ItemGroup>
     <Content Include="Lib\vJoyInterface.dll" />
     <Content Include="Lib\vJoyInterfaceWrap.dll" />
+    <Content Include="LogitechSteeringWheelEnginesWrapper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
