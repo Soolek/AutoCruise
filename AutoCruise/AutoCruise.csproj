@@ -134,6 +134,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Control\IControl.cs" />
+    <Compile Include="Control\FfbWheelIntermediaryControl.cs" />
     <Compile Include="Control\VJoyControl.cs" />
     <Compile Include="Control\KeyPressEmulator.cs" />
     <Compile Include="Helpers\ActionCommand.cs" />

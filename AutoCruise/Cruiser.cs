@@ -30,6 +30,10 @@ namespace AutoCruise
         public Parameters Parameters { get; private set; }
         public IControl Control { get; private set; }
 
+        public byte Gear { get; private set; }
+        public float Rpm { get; private set; }
+        private bool _startingEngine = false;
+
         public Cruiser()
         {
             Parameters = new Parameters()
@@ -40,16 +44,27 @@ namespace AutoCruise
                 MinClusterHeight = 10,
                 Steering = 0
             };
+
+            IControl outputControl;
             try
             {
-                Control = new VJoyControl();
+                outputControl = new VJoyControl();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + ", switching to keyboard control");
-                Control = new KeyPressEmulator();
+                MessageBox.Show(ex.Message + ", switching to keyboard control as output");
+                outputControl = new KeyPressEmulator();
             }
 
+            try
+            {
+                Control = new FfbWheelIntermediaryControl(outputControl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ", using pass-through control");
+                Control = outputControl;
+            }
 
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
@@ -103,6 +118,8 @@ namespace AutoCruise
         private void OutGauge_PacketReceived(object sender, OutGaugeEventArgs e)
         {
             Parameters.Speed = e.Speed;
+            Gear = e.Gear;
+            Rpm = e.RPM;
         }
 
         private float _prevLateral = 0;
@@ -179,6 +196,28 @@ namespace AutoCruise
 
                     _prevLongitudal = (_prevLongitudal * 2 + longitudal) / 3f;
                     control.SetLongitudal(_prevLongitudal);
+                    
+                    //brake if going backwards
+                    if(Gear==0 && Parameters.Speed>0.5)
+                    {
+                        control.SetLongitudal(-1);
+                        control.SetLateral(0);
+                    }
+                    //set Drive if neutral or reverse and standing still
+                    if (Gear <= 1 && Parameters.Speed < 1)
+                    {
+                        control.ShiftUp();
+                    }
+                    //start engine
+                    if(Rpm<300 && !_startingEngine)
+                    {
+                        control.Ignition();
+                        _startingEngine = true;
+                    }
+                    if(Rpm>400 && _startingEngine)
+                    {
+                        _startingEngine = false;
+                    }
                 }
                 else
                 {
