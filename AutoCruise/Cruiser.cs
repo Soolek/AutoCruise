@@ -67,6 +67,7 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
+                    //var screenCapture = new SharpDxScreenCapture();
                     var screenCapture = new GraphicsScreenCapture();
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
