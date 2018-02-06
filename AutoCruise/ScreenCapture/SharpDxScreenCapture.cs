@@ -93,7 +93,7 @@ namespace AutoCruise.ScreenCapture
             var mapSource = SharpDxDevice.ImmediateContext.MapSubresource(SharpDxTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
             // Copy pixels from screen capture Texture to GDI bitmap
-            var mapDest = SharpDxBitmap.LockBits(bounds, ImageLockMode.WriteOnly, SharpDxBitmap.PixelFormat);
+            var mapDest = SharpDxBitmap.LockBits(new Rectangle(0, 0, bounds.Width, bounds.Height), ImageLockMode.WriteOnly, SharpDxBitmap.PixelFormat);
             var sourcePtr = mapSource.DataPointer;
             var destPtr = mapDest.Scan0;
             for (int y = 0; y < bounds.Height; y++)

@@ -67,9 +67,7 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
-                    //var screenCapture = new SharpDxScreenCapture();
                     var screenCapture = new GraphicsScreenCapture();
-
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
                     outGauge.PacketReceived += OutGauge_PacketReceived;
@@ -107,6 +105,8 @@ namespace AutoCruise
             Parameters.Speed = e.Speed;
         }
 
+        private float _prevLateral = 0;
+        private float _prevLongitudal = 0;
         private void Work(IScreenCapture screenCapture, IControl control)
         {
             using (var screenShot = screenCapture.GetScreenShot())
@@ -165,15 +165,20 @@ namespace AutoCruise
 
                 Parameters.Steering = steering;
 
-                float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
-                var longitudal = Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed));
+                float desiredSpeed = 4 + 7f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - Parameters.Speed) / 8));
                 Parameters.Acc = Math.Max(0, longitudal);
                 Parameters.Brake = Math.Max(0, -longitudal);
 
                 if (Parameters.AutoDrive)
                 {
-                    control.SetLateral((float)steering);
-                    control.SetLongitudal(longitudal);
+                    var lateralDamper = Math.Max(0.1f, (Math.Abs(steering) - Math.Abs(_prevLateral)) * 10f);
+                    var dampedSteering = (lateralDamper * _prevLateral + steering) / (lateralDamper + 1f);
+                    _prevLateral = dampedSteering;//steering;
+                    control.SetLateral(dampedSteering);
+
+                    _prevLongitudal = (_prevLongitudal * 2 + longitudal) / 3f;
+                    control.SetLongitudal(_prevLongitudal);
                 }
                 else
                 {
@@ -195,17 +200,19 @@ namespace AutoCruise
         {
             var xsToCompare = lanePoints
                             //.Skip(1)
-                            .Take(12)
+                            //.Take(12)
                             .Select(p => p.X)
                             .ToArray();
 
             int sumOfDifferences = 0;
             for (int i = 1; i < xsToCompare.Length; i++)
             {
-                sumOfDifferences += Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
+                var diff = Math.Abs(xsToCompare[i] - xsToCompare[i - 1]);
+                diff *= diff;
+                sumOfDifferences += diff;
             }
 
-            maxSumOfDifferences = sumOfDifferences > maxSumOfDifferences ? sumOfDifferences : maxSumOfDifferences;
+            maxSumOfDifferences = sumOfDifferences * 2 / 3 > maxSumOfDifferences ? sumOfDifferences * 2 / 3 : maxSumOfDifferences;
 
             float laneCurvative = Math.Min(1f, sumOfDifferences / maxSumOfDifferences);
             return 1f - laneCurvative;
