@@ -101,29 +101,71 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(SpeedProperty, value));
-                SpeedForGui = value;
             }
         }
 
-        private static float _maxSpeed = 0;
-        public static readonly DependencyProperty SpeedForGuiProperty =
-            DependencyProperty.Register("SpeedForGui", typeof(float), typeof(Parameters));
-        public float SpeedForGui
+
+        public static readonly DependencyProperty AccProperty =
+            DependencyProperty.Register("Acc", typeof(float), typeof(Parameters));
+        public float Acc
         {
             get
             {
-                return this.Dispatcher.Invoke(() => (float)GetValue(SpeedForGuiProperty));
+                return this.Dispatcher.Invoke(() => (float)GetValue(AccProperty));
             }
             set
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    if (value > _maxSpeed)
-                    {
-                        _maxSpeed = value;
-                    }
-                    SetValue(SpeedForGuiProperty, value/_maxSpeed*80f);
+                    SetValue(AccProperty, value);
+                    AccForGui = value * 80f;
                 });
+            }
+        }
+
+        public static readonly DependencyProperty AccForGuiProperty =
+            DependencyProperty.Register("AccForGui", typeof(float), typeof(Parameters));
+        public float AccForGui
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(AccForGuiProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(AccForGuiProperty, value));
+            }
+        }
+
+        public static readonly DependencyProperty BrakeProperty =
+            DependencyProperty.Register("Brake", typeof(float), typeof(Parameters));
+        public float Brake
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(BrakeProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    SetValue(BrakeProperty, value);
+                    BrakeForGui = value * 80f;
+                });
+            }
+        }
+
+        public static readonly DependencyProperty BrakeForGuiProperty =
+            DependencyProperty.Register("BrakeForGui", typeof(float), typeof(Parameters));
+        public float BrakeForGui
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(BrakeForGuiProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(BrakeForGuiProperty, value));
             }
         }
 

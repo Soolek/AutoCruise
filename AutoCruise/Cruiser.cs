@@ -131,8 +131,8 @@ namespace AutoCruise
                 img = FilterOutSobel(img, perspectiveImg);
                 ShowSelectedImage(img, imageStep++);
 
-                img = FilterPixelClusters(img);
-                ShowSelectedImage(img, imageStep++);
+                //img = FilterPixelClusters(img);
+                //ShowSelectedImage(img, imageStep++);
 
                 img = MarkLanes(img, out leftPoints, out rightPoints);
                 ShowSelectedImage(img, imageStep++);
@@ -160,12 +160,15 @@ namespace AutoCruise
 
                 Parameters.Steering = steering;
 
+                float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                var longitudal = Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed));
+                Parameters.Acc = Math.Max(0, longitudal);
+                Parameters.Brake = Math.Max(0, -longitudal);
+
                 if (Parameters.AutoDrive)
                 {
                     control.SetLateral((float)steering);
-
-                    float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
-                    control.SetLongitudal(Math.Min(1, Math.Max(-1, desiredSpeed - Parameters.Speed)));
+                    control.SetLongitudal(longitudal);
                 }
                 else
                 {
