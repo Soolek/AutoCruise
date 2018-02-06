@@ -74,7 +74,6 @@ namespace AutoCruise.Control
 
         public void SetLateral(float lateral)
         {
-            lateral *= 2;
             var limitedVal = Math.Min(1f, Math.Max(-1f, lateral));
             var val = (int)(limitedVal * halfAxis) + halfAxis;
             joy.SetAxis(val, id, HID_USAGES.HID_USAGE_X);

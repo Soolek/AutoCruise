@@ -69,6 +69,7 @@ namespace AutoCruise
                 {
                     //var screenCapture = new SharpDxScreenCapture();
                     var screenCapture = new GraphicsScreenCapture();
+
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
                     outGauge.PacketReceived += OutGauge_PacketReceived;
@@ -122,8 +123,6 @@ namespace AutoCruise
 
                 img = Perspective(img);
                 ShowSelectedImage(img, imageStep++);
-
-                //TODO: warp curve the image to straight it out (use data from previous run)
 
                 img = Blur(img);
                 ShowSelectedImage(img, imageStep++);
