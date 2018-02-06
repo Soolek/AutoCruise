@@ -122,7 +122,7 @@ namespace AutoCruise
                     {
                         _maxSpeed = value;
                     }
-                    SetValue(SpeedForGuiProperty, value/_maxSpeed*80f);
+                    SetValue(SpeedForGuiProperty, value / _maxSpeed * 80f);
                 });
             }
         }
@@ -155,9 +155,14 @@ namespace AutoCruise
                 {
                     value = 0;
                 }
+                else if (value > MaxImageStep)
+                {
+                    value = MaxImageStep;
+                }
 
-                SetValue(ImageStepProperty, value);
+                this.Dispatcher.Invoke(() => SetValue(ImageStepProperty, value));
             }
         }
+        public int MaxImageStep { get; set; }
     }
 }
