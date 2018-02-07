@@ -45,7 +45,7 @@ namespace AutoCruise.ScreenCapture
 
         private void InitSharpDXCapture()
         {
-            var bounds = GetBounds();
+            //var bounds = GetBounds();
 
             var factory = new Factory1();
             //Get first adapter
@@ -56,7 +56,9 @@ namespace AutoCruise.ScreenCapture
             var output = adapter.GetOutput(0);
             var output1 = output.QueryInterface<Output1>();
 
-            SharpDxDuplicatedOutput = output1.DuplicateOutput(SharpDxDevice);
+            var bounds = output.Description.DesktopBounds;
+            int width = bounds.Right - bounds.Left;
+            int height = bounds.Bottom - bounds.Top;
 
             // Create Staging texture CPU-accessible
             var textureDesc = new Texture2DDescription
@@ -64,8 +66,8 @@ namespace AutoCruise.ScreenCapture
                 CpuAccessFlags = CpuAccessFlags.Read,
                 BindFlags = BindFlags.None,
                 Format = Format.B8G8R8A8_UNorm,
-                Width = bounds.Width,
-                Height = bounds.Height,
+                Width = width,
+                Height = height,
                 OptionFlags = ResourceOptionFlags.None,
                 MipLevels = 1,
                 ArraySize = 1,
@@ -74,32 +76,37 @@ namespace AutoCruise.ScreenCapture
             };
             SharpDxTexture = new Texture2D(SharpDxDevice, textureDesc);
 
-            SharpDxBitmap = new Bitmap(bounds.Width, bounds.Height, PixelFormat.Format32bppArgb);
+            SharpDxDuplicatedOutput = output1.DuplicateOutput(SharpDxDevice);
+
+            SharpDxBitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
         }
 
         public Bitmap GetScreenShot()
         {
-            var bounds = GetBounds();
+            //var bounds = GetBounds();
 
             SharpDX.DXGI.Resource screenResource;
             OutputDuplicateFrameInformation duplicateFrameInformation;
 
             // Try to get duplicated frame within given time is ms
-            SharpDxDuplicatedOutput.AcquireNextFrame(5, out duplicateFrameInformation, out screenResource);
+            SharpDxDuplicatedOutput.AcquireNextFrame(1000, out duplicateFrameInformation, out screenResource);
+            
             // copy resource into memory that can be accessed by the CPU
             using (var screenTexture2D = screenResource.QueryInterface<Texture2D>())
                 SharpDxDevice.ImmediateContext.CopyResource(screenTexture2D, SharpDxTexture);
+
             // Get the desktop capture texture
             var mapSource = SharpDxDevice.ImmediateContext.MapSubresource(SharpDxTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
 
+            
             // Copy pixels from screen capture Texture to GDI bitmap
-            var mapDest = SharpDxBitmap.LockBits(new Rectangle(0, 0, bounds.Width, bounds.Height), ImageLockMode.WriteOnly, SharpDxBitmap.PixelFormat);
+            var mapDest = SharpDxBitmap.LockBits(new Rectangle(0, 0, SharpDxBitmap.Width, SharpDxBitmap.Height), ImageLockMode.WriteOnly, SharpDxBitmap.PixelFormat);
             var sourcePtr = mapSource.DataPointer;
             var destPtr = mapDest.Scan0;
-            for (int y = 0; y < bounds.Height; y++)
+            for (int y = 0; y < SharpDxBitmap.Height; y++)
             {
                 // Copy a single line 
-                Utilities.CopyMemory(destPtr, sourcePtr, bounds.Width * 4);
+                Utilities.CopyMemory(destPtr, sourcePtr, SharpDxBitmap.Width * 4);
 
                 // Advance pointers
                 sourcePtr = IntPtr.Add(sourcePtr, mapSource.RowPitch);
@@ -109,6 +116,9 @@ namespace AutoCruise.ScreenCapture
             // Release source and dest locks
             SharpDxBitmap.UnlockBits(mapDest);
             SharpDxDevice.ImmediateContext.UnmapSubresource(SharpDxTexture, 0);
+
+            screenResource.Dispose();
+            SharpDxDuplicatedOutput.ReleaseFrame();
 
             return SharpDxBitmap;
         }

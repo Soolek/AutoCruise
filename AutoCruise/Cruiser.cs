@@ -67,7 +67,8 @@ namespace AutoCruise
             }
             _cruiseThread = new Thread(() =>
                 {
-                    var screenCapture = new GraphicsScreenCapture();
+                    var screenCapture = GetScreenCapture();
+
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
                     outGauge.PacketReceived += OutGauge_PacketReceived;
@@ -98,6 +99,22 @@ namespace AutoCruise
                     }
                 });
             _cruiseThread.Start();
+        }
+
+        private IScreenCapture GetScreenCapture()
+        {
+            IScreenCapture screenCapture;
+            try
+            {
+                screenCapture = new SharpDxScreenCapture();
+                screenCapture.GetScreenShot();
+            }
+            catch (SharpDX.SharpDXException ex)
+            {
+                //Doesnt work in 8bpp or non-DWM desktop modes
+                screenCapture = new GraphicsScreenCapture();
+            }
+            return screenCapture;
         }
 
         private void OutGauge_PacketReceived(object sender, OutGaugeEventArgs e)
