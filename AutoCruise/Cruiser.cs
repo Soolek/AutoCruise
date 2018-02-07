@@ -107,7 +107,8 @@ namespace AutoCruise
             try
             {
                 screenCapture = new SharpDxScreenCapture();
-                screenCapture.GetScreenShot();
+                using (var temp = screenCapture.GetScreenShot())
+                { }
             }
             catch (SharpDX.SharpDXException ex)
             {
