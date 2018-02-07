@@ -60,6 +60,23 @@ namespace AutoCruise.Control
                 {
                     OutputControl.ShiftUp();
                 }
+
+                int damper = (int)(Math.Max(0, 2f - Cruiser.Parameters.Speed) * 25);
+                if (damper > 0)
+                {
+                    LogitechGSDK.LogiStopSpringForce(0);
+                    LogitechGSDK.LogiPlayDamperForce(0, damper);
+                }
+                else
+                {
+                    LogitechGSDK.LogiStopDamperForce(0);
+                    int centeringForce = Math.Min(90, (int)(Cruiser.Parameters.Speed * 4));
+                    LogitechGSDK.LogiPlaySpringForce(0, 0, centeringForce, centeringForce);
+                }
+            }
+            else
+            {
+                LogitechGSDK.LogiStopDamperForce(0);
             }
         }
 
