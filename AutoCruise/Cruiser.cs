@@ -27,7 +27,7 @@ namespace AutoCruise
         int Width = 640;
         int Height = 480;
 
-        public Parameters Parameters { get; private set; }
+        public static Parameters Parameters { get; private set; }
         public IControl Control { get; private set; }
 
         public byte Gear { get; private set; }
@@ -44,27 +44,6 @@ namespace AutoCruise
                 MinClusterHeight = 10,
                 Steering = 0
             };
-
-            IControl outputControl;
-            try
-            {
-                outputControl = new VJoyControl();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ", switching to keyboard control as output");
-                outputControl = new KeyPressEmulator();
-            }
-
-            try
-            {
-                Control = new FfbWheelIntermediaryControl(outputControl);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ", using pass-through control");
-                Control = outputControl;
-            }
 
             _cancelToken = new CancellationTokenSource();
             _imageViewer = new ImageViewer() { Width = Width, Height = Height };
@@ -83,6 +62,7 @@ namespace AutoCruise
             _cruiseThread = new Thread(() =>
                 {
                     var screenCapture = GetScreenCapture();
+                    InitializeControl();
 
                     OutGauge outGauge = new OutGauge();
                     outGauge.Connect("127.0.0.1", 666);
@@ -114,6 +94,30 @@ namespace AutoCruise
                     }
                 });
             _cruiseThread.Start();
+        }
+
+        private void InitializeControl()
+        {
+            IControl outputControl;
+            try
+            {
+                outputControl = new VJoyControl();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ", switching to keyboard control as output");
+                outputControl = new KeyPressEmulator();
+            }
+
+            try
+            {
+                Control = new FfbWheelIntermediaryControl(outputControl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ", using pass-through control");
+                Control = outputControl;
+            }
         }
 
         private IScreenCapture GetScreenCapture()
@@ -200,7 +204,7 @@ namespace AutoCruise
 
                 Parameters.Steering = steering;
 
-                float desiredSpeed = 4 + 7f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
                 var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - Parameters.Speed) / 8));
                 Parameters.Acc = Math.Max(0, longitudal);
                 Parameters.Brake = Math.Max(0, -longitudal);
