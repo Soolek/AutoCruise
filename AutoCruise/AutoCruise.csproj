@@ -188,9 +188,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Lib\vJoyInterface.dll" />
     <Content Include="Lib\vJoyInterfaceWrap.dll" />
     <Content Include="LogitechSteeringWheelEnginesWrapper.dll">
