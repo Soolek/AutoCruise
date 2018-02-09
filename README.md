@@ -2,6 +2,8 @@ AutoCruise
 : .Net vision based cruise and steer controller
 =========================================================
 
+[![youtube link](https://img.youtube.com/vi/MKALTq9Zse0/0.jpg)](https://www.youtube.com/watch?v=MKALTq9Zse0)
+
 # Installation
 * Get LiveForSpeed [www.lfs.net](http://www.lfs.net)
 1. Change outgauge config accordingly:  
@@ -21,8 +23,9 @@ AutoCruise
 - Add IoC
 - Establish solid control pipeline
 - Change FFB from spring to custom constant force implementation
+- Add Radiant sliding window algorithm
 - Add Polymonial fit for lanes
-- Increase FOV
+- Increase FOV + change perspective
 
 ## 2.0
 + LogitechSDK FFB steering
