@@ -38,14 +38,14 @@ namespace AutoCruise.Control
 
         private static float longitudalTreshold = 0.4f;
         private float _lastLongitudal = 0;
-        public void SetLongitudal(float longitudal)
+        public void SetLongitudal(float? longitudal)
         {
-            if (Math.Abs(longitudal) < longitudalTreshold)
+            if (longitudal==null || Math.Abs(longitudal.Value) < longitudalTreshold)
             {
                 longitudal = 0;
             }
 
-            if (Math.Sign(longitudal) != Math.Sign(_lastLongitudal))
+            if (Math.Sign(longitudal.Value) != Math.Sign(_lastLongitudal))
             {
                 PostMessage(_gamehWnd, WM_KEYUP, VK_UP, 0);
                 PostMessage(_gamehWnd, WM_KEYUP, VK_DOWN, 0);
@@ -55,20 +55,20 @@ namespace AutoCruise.Control
                 else if (longitudal < -longitudalTreshold)
                     PostMessage(_gamehWnd, WM_KEYDOWN, VK_DOWN, 0);
 
-                _lastLongitudal = longitudal;
+                _lastLongitudal = longitudal.Value;
             }
         }
 
         private static float lateralTreshold = 0.3f;
         private float _lastLateral = 0;
-        public void SetLateral(float lateral)
+        public void SetLateral(float? lateral)
         {
-            if(Math.Abs(lateral) < lateralTreshold)
+            if(lateral==null || Math.Abs(lateral.Value) < lateralTreshold)
             {
                 lateral = 0;
             }
 
-            if (Math.Sign(lateral) != Math.Sign(_lastLateral))
+            if (Math.Sign(lateral.Value) != Math.Sign(_lastLateral))
             {
                 PostMessage(_gamehWnd, WM_KEYUP, VK_LEFT, 0);
                 PostMessage(_gamehWnd, WM_KEYUP, VK_RIGHT, 0);
@@ -78,7 +78,7 @@ namespace AutoCruise.Control
                 else if (lateral < -lateralTreshold)
                     PostMessage(_gamehWnd, WM_KEYDOWN, VK_LEFT, 0);
 
-                _lastLateral = lateral;
+                _lastLateral = lateral.Value;
             }
         }
 

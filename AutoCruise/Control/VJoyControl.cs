@@ -65,16 +65,24 @@ namespace AutoCruise.Control
         }
 
         private static int halfAxis = Int16.MaxValue / 2;
-        public void SetLongitudal(float longitudal)
+        public void SetLongitudal(float? longitudal)
         {
-            var limitedVal = Math.Min(1f, Math.Max(-1f, longitudal));
+            if (longitudal == null)
+            {
+                longitudal = 0;
+            }
+            var limitedVal = Math.Min(1f, Math.Max(-1f, longitudal.Value));
             var val = (int)(limitedVal * halfAxis) + halfAxis;
             joy.SetAxis(val, id, HID_USAGES.HID_USAGE_Y);
         }
 
-        public void SetLateral(float lateral)
+        public void SetLateral(float? lateral)
         {
-            var limitedVal = Math.Min(1f, Math.Max(-1f, lateral));
+            if (lateral == null)
+            {
+                lateral = 0;
+            }
+            var limitedVal = Math.Min(1f, Math.Max(-1f, lateral.Value));
             var val = (int)(limitedVal * halfAxis) + halfAxis;
             joy.SetAxis(val, id, HID_USAGES.HID_USAGE_X);
         }
