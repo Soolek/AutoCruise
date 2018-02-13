@@ -9,8 +9,8 @@ namespace AutoCruise.Control
     public interface IControl : IDisposable
     {
         void Reset();
-        void SetLongitudal(float longitudal);
-        void SetLateral(float lateral);
+        void SetLongitudal(float? longitudal);
+        void SetLateral(float? lateral);
         void ShiftUp();
         void ShiftDown();
         void Ignition();

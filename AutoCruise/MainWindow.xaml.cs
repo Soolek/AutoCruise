@@ -14,42 +14,55 @@ using System.Windows.Shapes;
 using System.Threading;
 using AutoCruise.Helpers;
 using AutoCruise.Control;
+using Autofac;
+using AutoCruise.Modules;
 
 namespace AutoCruise
 {
     public partial class MainWindow : Window
     {
-        public Cruiser Cruiser { get; private set; }
+        private Parameters _parameters;
+        private IControl _control;
 
         public MainWindow()
         {
-            Cruiser = new Cruiser();
-            this.DataContext = Cruiser;
+            InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //IoC initialization here due to some of the libraries using pointer to main app window
+            AutofacConfig.BuildContainer();
+
+            _control = AutofacConfig.Container.Resolve<IControl>();
+            _parameters = AutofacConfig.Container.Resolve<Parameters>();
+            this.DataContext = _parameters;
 
             this.KeyUp += MainWindow_KeyUp;
             this.KeyDown += MainWindow_KeyDown;
 
-            InitializeComponent();
+            AutofacConfig.Container.Resolve<OutGaugeParametersUpdater>().StartUpdatingParameters();
+            AutofacConfig.Container.Resolve<Cruiser>().Start();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.J)
             {
-                Cruiser.Control.SetLateral(-1);
+                _control.SetLateral(-1);
             }
             else if (e.Key == Key.L)
             {
-                Cruiser.Control.SetLateral(1);
+                _control.SetLateral(1);
             }
 
             if (e.Key == Key.I)
             {
-                Cruiser.Control.SetLongitudal(1);
+                _control.SetLongitudal(1);
             }
             else if (e.Key == Key.K)
             {
-                Cruiser.Control.SetLongitudal(-1);
+                _control.SetLongitudal(-1);
             }
         }
 
@@ -57,55 +70,50 @@ namespace AutoCruise
         {
             if (e.Key == Key.A)
             {
-                Cruiser.Parameters.AutoDrive = !Cruiser.Parameters.AutoDrive;
-                if (!Cruiser.Parameters.AutoDrive)
+                _parameters.AutoDrive = !_parameters.AutoDrive;
+                if (!_parameters.AutoDrive)
                 {
-                    Cruiser.Control.SetLateral(0);
-                    Cruiser.Control.SetLongitudal(0);
+                    _control.SetLateral(null);
+                    _control.SetLongitudal(null);
                 }
             }
             if (e.Key == Key.Z)
             {
-                Cruiser.Parameters.ImageStep--;
+                _parameters.ImageStep--;
             }
             if (e.Key == Key.X)
             {
-                Cruiser.Parameters.ImageStep++;
+                _parameters.ImageStep++;
             }
 
             if (e.Key == Key.J || e.Key == Key.L)
             {
-                Cruiser.Control.SetLateral(0);
+                _control.SetLateral(null);
             }
 
             if (e.Key == Key.I || e.Key == Key.K)
             {
-                Cruiser.Control.SetLongitudal(0);
+                _control.SetLongitudal(null);
             }
 
             if (e.Key == Key.Y)
             {
-                Cruiser.Control.ShiftUp();
+                _control.ShiftUp();
             }
             else if (e.Key == Key.H)
             {
-                Cruiser.Control.ShiftDown();
+                _control.ShiftDown();
             }
 
             if (e.Key == Key.U)
             {
-                Cruiser.Control.Ignition();
+                _control.Ignition();
             }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Cruiser.Dispose();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Cruiser.Start();
+            AutofacConfig.Container.Dispose();
         }
     }
 }

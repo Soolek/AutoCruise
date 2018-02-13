@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -206,5 +207,47 @@ namespace AutoCruise
             }
         }
         public int MaxImageStep { get; set; }
+
+        public static readonly DependencyProperty GearProperty =
+            DependencyProperty.Register("Gear", typeof(byte), typeof(Parameters));
+        public byte Gear
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (byte)GetValue(GearProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(GearProperty, value));
+            }
+        }
+
+        public static readonly DependencyProperty RpmProperty =
+            DependencyProperty.Register("Rpm", typeof(float), typeof(Parameters));
+        public float Rpm
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (float)GetValue(RpmProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(RpmProperty, value));
+            }
+        }
+
+        public static readonly DependencyProperty ImageProperty =
+            DependencyProperty.Register("Image", typeof(Bitmap), typeof(Parameters));
+        public Bitmap Image
+        {
+            get
+            {
+                return this.Dispatcher.Invoke(() => (Bitmap)GetValue(ImageProperty));
+            }
+            set
+            {
+                this.Dispatcher.Invoke(() => SetValue(ImageProperty, value));
+            }
+        }
     }
 }

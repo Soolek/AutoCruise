@@ -18,14 +18,16 @@ AutoCruise
 
 # Versions
 
-## 2.1 - Work in progress
-- Clean up module initialization
-- Add IoC
-- Establish solid control pipeline
+## 2.2 - Work in progress
 - Change FFB from spring to custom constant force implementation
 - Add Radiant sliding window algorithm
 - Add Polymonial fit for lanes
 - Increase FOV + change perspective
+
+## 2.1
++ Clean up module initialization
++ Add IoC
++ Establish solid control pipeline
 
 ## 2.0
 + LogitechSDK FFB steering

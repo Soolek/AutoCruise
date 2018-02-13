@@ -13,18 +13,26 @@ namespace AutoCruise.Control
     public class FfbWheelIntermediaryControl : IControl
     {
         public IControl OutputControl { get; private set; }
+        private Parameters _parameters { get; set; }
 
         private int _maxOffset = 80;
         private bool _logiTaskRun = true;
         private Task _logiTask;
 
-        public FfbWheelIntermediaryControl(IControl outputControl)
+        private float? _inputLongitudal;
+        private float? _inputLateral;
+
+        public FfbWheelIntermediaryControl(IControl outputControl, Parameters parameters)
         {
             OutputControl = outputControl;
+            _parameters = parameters;
+
+            InitializeLogi();
 
             _logiTask = new Task(() =>
             {
                 Thread.Sleep(2000);
+
                 while (_logiTaskRun)
                 {
                     if (_logiInitialized && LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(0))
@@ -43,25 +51,31 @@ namespace AutoCruise.Control
             float lateral = ((float)state.lX / Int16.MaxValue) / (_maxOffset / 100f);
             OutputControl.SetLateral(lateral);
 
-            if (!Cruiser.Parameters.AutoDrive)
+            float acc = (float)(-state.lY + Int16.MaxValue) / (2 * Int16.MaxValue);
+            float brake = (float)(-state.lRz + Int16.MaxValue) / (2 * Int16.MaxValue);
+            float pedalsLongitudal = acc - brake;
+            OutputControl.SetLongitudal(pedalsLongitudal != 0 ? pedalsLongitudal : _inputLongitudal ?? 0);
+
+            var pressedButtons = GetPressedButtons(state.rgbButtons);
+            var justPressedButtons = GetJustPressedButtons(pressedButtons).ToList();
+
+            if (justPressedButtons.Contains(10))
             {
-                var pressedButtons = GetPressedButtons(state.rgbButtons);
-                var justPressedButtons = GetJustPressedButtons(pressedButtons).ToList();
+                OutputControl.ShiftDown();
+            }
+            if (justPressedButtons.Contains(11))
+            {
+                OutputControl.ShiftUp();
+            }
 
-                float acc = (float)(-state.lY + Int16.MaxValue) / (2 * Int16.MaxValue);
-                float brake = (float)(-state.lRz + Int16.MaxValue) / (2 * Int16.MaxValue);
-                OutputControl.SetLongitudal(acc - brake);
-
-                if (justPressedButtons.Contains(10))
-                {
-                    OutputControl.ShiftDown();
-                }
-                if (justPressedButtons.Contains(11))
-                {
-                    OutputControl.ShiftUp();
-                }
-
-                int damper = (int)(Math.Max(0, 2f - Cruiser.Parameters.Speed) * 25);
+            if (_inputLateral != null)
+            {
+                LogitechGSDK.LogiStopDamperForce(0);
+                LogitechGSDK.LogiPlaySpringForce(0, (int)(_inputLateral * _maxOffset), 80, 80);
+            }
+            else
+            {
+                int damper = (int)(Math.Max(0, 0.5f - _parameters.Speed) * 25);
                 if (damper > 0)
                 {
                     LogitechGSDK.LogiStopSpringForce(0);
@@ -70,13 +84,9 @@ namespace AutoCruise.Control
                 else
                 {
                     LogitechGSDK.LogiStopDamperForce(0);
-                    int centeringForce = Math.Min(90, (int)(Cruiser.Parameters.Speed * 4));
+                    int centeringForce = Math.Min(90, (int)(_parameters.Speed * 4));
                     LogitechGSDK.LogiPlaySpringForce(0, 0, centeringForce, centeringForce);
                 }
-            }
-            else
-            {
-                LogitechGSDK.LogiStopDamperForce(0);
             }
         }
 
@@ -123,52 +133,29 @@ namespace AutoCruise.Control
             }
         }
 
-        public void SetLateral(float lateral)
+        public void SetLateral(float? lateral)
         {
-            InitializeLogi();
-
-            if (!Cruiser.Parameters.AutoDrive)
-            {
-                OutputControl.SetLateral(lateral);
-                LogitechGSDK.LogiStopSpringForce(0);
-                return;
-            }
-
-            if (LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(0))
-            {
-                if (lateral == 0)
-                {
-                    LogitechGSDK.LogiStopSpringForce(0);
-                }
-                else
-                {
-                    LogitechGSDK.LogiPlaySpringForce(0, (int)(lateral * _maxOffset), 80, 80);
-                }
-            }
+            _inputLateral = lateral;
         }
 
-        public void SetLongitudal(float longitudal)
+        public void SetLongitudal(float? longitudal)
         {
-            if (Cruiser.Parameters.AutoDrive)
-                OutputControl.SetLongitudal(longitudal);
+            _inputLongitudal = longitudal;
         }
 
         public void ShiftUp()
         {
-            if (Cruiser.Parameters.AutoDrive)
-                OutputControl.ShiftUp();
+            OutputControl.ShiftUp();
         }
 
         public void ShiftDown()
         {
-            if (Cruiser.Parameters.AutoDrive)
-                OutputControl.ShiftDown();
+            OutputControl.ShiftDown();
         }
 
         public void Ignition()
         {
-            if (Cruiser.Parameters.AutoDrive)
-                OutputControl.Ignition();
+            OutputControl.Ignition();
         }
 
         public void Reset()
