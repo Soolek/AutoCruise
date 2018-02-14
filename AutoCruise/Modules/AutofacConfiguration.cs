@@ -73,13 +73,15 @@ namespace AutoCruise.Modules
                 outputControl = new KeyPressEmulator();
             }
 
-            try
+            var ffbControlProxy = new FfbWheelIntermediaryControl(outputControl, parameters);
+            if (ffbControlProxy.Initialized)
             {
-                return new FfbWheelIntermediaryControl(outputControl, parameters);
+                return ffbControlProxy;
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Logitech SDK failed, using pass-through control: "+ex.Message);
+                ffbControlProxy.Dispose();
+                MessageBox.Show("Logitech SDK not initialized (wheel not found?), using pass-through control");
                 return outputControl;
             }
         }
