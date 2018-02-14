@@ -139,7 +139,7 @@ namespace AutoCruise.Modules
                 _parameters.Steering = steering;
 
                 float straightness = Math.Min(LaneStraightness(leftPoints), LaneStraightness(rightPoints));
-                float desiredSpeed = 4 + 12f * (straightness * straightness);
+                float desiredSpeed = 4 + 10f * (straightness * straightness);
                 var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - _parameters.Speed) / 8));
                 _parameters.Acc = Math.Max(0, longitudal);
                 _parameters.Brake = Math.Max(0, -longitudal);
@@ -160,8 +160,8 @@ namespace AutoCruise.Modules
                         _control.SetLongitudal(-1);
                         _control.SetLateral(0);
                     }
-                    //set Drive if neutral or reverse and standing still
-                    if (_parameters.Gear <= 1 && _parameters.Speed < 1)
+                    //set Drive if reverse and standing still
+                    else if (_parameters.Gear <= 1 && _parameters.Speed < 1) 
                     {
                         _control.ShiftUp();
                     }

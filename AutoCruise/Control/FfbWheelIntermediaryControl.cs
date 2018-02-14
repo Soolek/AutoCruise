@@ -62,25 +62,22 @@ namespace AutoCruise.Control
             _outputControl.SetLongitudal(pedalsLongitudal != 0 ? pedalsLongitudal : _inputLongitudal ?? 0);
 
             var pressedButtons = GetPressedButtons(state.rgbButtons);
-            var justPressedButtons = GetJustPressedButtons(pressedButtons).ToList();
+            DoAutomaticGearbox(pressedButtons);
 
-            if (justPressedButtons.Contains(10))
-            {
-                _outputControl.ShiftDown();
-            }
-            if (justPressedButtons.Contains(11))
-            {
-                _outputControl.ShiftUp();
-            }
-
-            if (_inputLateral != null)
+            var inputLateral = _inputLateral;
+            if (inputLateral != null)
             {
                 LogitechGSDK.LogiStopDamperForce(0);
-                LogitechGSDK.LogiPlaySpringForce(0, (int)(_inputLateral * _maxOffset), 80, 80);
+                if (Math.Abs(inputLateral.Value) < 0.02)
+                {
+                    inputLateral = 0;
+                }
+                int feedbackForce = Math.Min(80, (int)(60 + _parameters.Speed * 2));
+                LogitechGSDK.LogiPlaySpringForce(0, (int)(inputLateral * _maxOffset), 60, feedbackForce);
             }
             else
             {
-                int damper = (int)(Math.Max(0, 0.5f - _parameters.Speed) * 25);
+                int damper = (int)(Math.Max(0, 0.5f - _parameters.Speed) * 100);
                 if (damper > 0)
                 {
                     LogitechGSDK.LogiStopSpringForce(0);
@@ -89,8 +86,42 @@ namespace AutoCruise.Control
                 else
                 {
                     LogitechGSDK.LogiStopDamperForce(0);
-                    int centeringForce = Math.Min(90, (int)(_parameters.Speed * 4));
+                    int centeringForce = Math.Min(90, (int)(20 + _parameters.Speed * 2));
                     LogitechGSDK.LogiPlaySpringForce(0, 0, centeringForce, centeringForce);
+                }
+            }
+        }
+
+        private void DoAutomaticGearbox(List<byte> pressedButtons)
+        {
+            if (!_parameters.AutoDrive)
+            {
+                //if (pressedButtons.Contains(10))
+                //{
+                //    if (_parameters.Gear > 0)
+                //        _outputControl.ShiftDown();
+                //}
+                //else if (pressedButtons.Contains(11))
+                //{
+                //    if (_parameters.Gear < 2)
+                //        _outputControl.ShiftUp();
+                //}
+                //else
+                //{
+                //    if (_parameters.Gear < 1)
+                //        _outputControl.ShiftUp();
+                //    else if (_parameters.Gear > 1)
+                //        _outputControl.ShiftDown();
+                //}
+
+                var justPressedButtons = GetJustPressedButtons(pressedButtons).ToList();
+                if (justPressedButtons.Contains(10))
+                {
+                    _outputControl.ShiftDown();
+                }
+                if (justPressedButtons.Contains(11))
+                {
+                    _outputControl.ShiftUp();
                 }
             }
         }

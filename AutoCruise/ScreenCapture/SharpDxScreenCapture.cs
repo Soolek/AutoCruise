@@ -97,7 +97,7 @@ namespace AutoCruise.ScreenCapture
             OutputDuplicateFrameInformation duplicateFrameInformation;
 
             // Try to get duplicated frame within given time is ms
-            SharpDxDuplicatedOutput.AcquireNextFrame(30, out duplicateFrameInformation, out screenResource);
+            SharpDxDuplicatedOutput.AcquireNextFrame(1000, out duplicateFrameInformation, out screenResource);
 
             // copy resource into memory that can be accessed by the CPU
             using (var screenTexture2D = screenResource.QueryInterface<Texture2D>())
