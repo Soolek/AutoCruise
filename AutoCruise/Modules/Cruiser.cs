@@ -2,19 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Windows;
-using AutoCruise.Main;
 using AutoCruise.ScreenCapture;
-using Emgu.CV.UI;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using System.Drawing;
 using AutoCruise.Control;
-using InSimDotNet.Out;
-
-using vJoyInterfaceWrap;
 using AutoCruise.ImageViewer;
 
 namespace AutoCruise.Modules
@@ -125,21 +117,25 @@ namespace AutoCruise.Modules
                 float steering = 0;
 
                 //steer to center of lane
-                int maxYpoints = 5;
+                int maxYpoints = 4;
                 float laneSteering = 0;
-                for (int y = 1; y <= maxYpoints; y++)
+                for (int y = 2; y <= maxYpoints; y++)
                 {
                     var laneCenterOffset = leftPoints[y].X + rightPoints[y].X - Width;
                     laneSteering += (float)laneCenterOffset * 3 / Width;
                 }
                 laneSteering /= maxYpoints;
-                steering += laneSteering;
+                steering += laneSteering * 2f / 3f;
 
                 //steer parallel to lane
-                float directionSteering =
-                    (rightPoints[5].X - rightPoints[1].X) * 1.0f / (rightPoints[1].Y - rightPoints[5].Y)
-                    + (leftPoints[5].X - leftPoints[1].X) * 1.0f / (leftPoints[1].Y - leftPoints[5].Y);
-                steering += directionSteering / 2f;
+                float directionSteering = 0;
+                for (int y = 3; y <= 5; y++)
+                {
+                    directionSteering +=
+                        (rightPoints[y + 1].X - rightPoints[y].X) / 40f
+                    + (leftPoints[y + 1].X - leftPoints[y].X) / 40f;
+                }
+                steering += directionSteering * 2f / 3f;
 
                 _parameters.Steering = steering;
 
