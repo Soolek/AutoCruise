@@ -16,10 +16,14 @@ using AutoCruise.Helpers;
 using AutoCruise.Control;
 using Autofac;
 using AutoCruise.Modules;
+using AutoCruise.ImageViewer;
+using Emgu.CV;
+using System.Drawing;
+using System.IO;
 
 namespace AutoCruise
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IImageViewer
     {
         private Parameters _parameters;
         private IControl _control;
@@ -32,7 +36,7 @@ namespace AutoCruise
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //IoC initialization here due to some of the libraries using pointer to main app window
-            AutofacConfig.BuildContainer();
+            AutofacConfig.BuildContainer(this);
 
             _control = AutofacConfig.Container.Resolve<IControl>();
             _parameters = AutofacConfig.Container.Resolve<Parameters>();
@@ -114,6 +118,29 @@ namespace AutoCruise
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             AutofacConfig.Container.Dispose();
+        }
+
+        public void SetImage(IImage image)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                this.DisplayImage.Source = BitmapToImageSource(image.Bitmap);
+            });
+        }
+        private BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
         }
     }
 }

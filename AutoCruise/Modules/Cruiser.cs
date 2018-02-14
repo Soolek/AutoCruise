@@ -2,19 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Windows;
-using AutoCruise.Main;
 using AutoCruise.ScreenCapture;
-using Emgu.CV.UI;
 using Emgu.CV;
 using Emgu.CV.Structure;
-using System.Drawing;
 using AutoCruise.Control;
-using InSimDotNet.Out;
-
-using vJoyInterfaceWrap;
 using AutoCruise.ImageViewer;
 
 namespace AutoCruise.Modules
@@ -121,29 +113,33 @@ namespace AutoCruise.Modules
                 _parameters.MaxImageStep = imageStep - 1;
 
                 //CONTROL
-
                 float steering = 0;
 
                 //steer to center of lane
                 int maxYpoints = 5;
                 float laneSteering = 0;
-                for (int y = 1; y <= maxYpoints; y++)
+                for (int y = 2; y <= maxYpoints; y++)
                 {
                     var laneCenterOffset = leftPoints[y].X + rightPoints[y].X - Width;
                     laneSteering += (float)laneCenterOffset * 3 / Width;
                 }
                 laneSteering /= maxYpoints;
-                steering += laneSteering;
+                steering += laneSteering; //* 3f / 2f;
 
                 //steer parallel to lane
-                float directionSteering =
-                    (rightPoints[5].X - rightPoints[1].X) * 1.0f / (rightPoints[1].Y - rightPoints[5].Y)
-                    + (leftPoints[5].X - leftPoints[1].X) * 1.0f / (leftPoints[1].Y - leftPoints[5].Y);
-                steering += directionSteering / 2f;
+                float directionSteering = 0;
+                for (int y = 3; y <= 5; y++)
+                {
+                    directionSteering +=
+                        (rightPoints[y + 1].X - rightPoints[y].X) / 40f
+                    + (leftPoints[y + 1].X - leftPoints[y].X) / 40f;
+                }
+                steering += directionSteering * 2f / 3f;
 
                 _parameters.Steering = steering;
 
-                float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                float straightness = Math.Min(LaneStraightness(leftPoints), LaneStraightness(rightPoints));
+                float desiredSpeed = 4 + 12f * (straightness * straightness);
                 var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - _parameters.Speed) / 8));
                 _parameters.Acc = Math.Max(0, longitudal);
                 _parameters.Brake = Math.Max(0, -longitudal);
@@ -199,7 +195,7 @@ namespace AutoCruise.Modules
         private float LaneStraightness(List<System.Drawing.Point> lanePoints)
         {
             var xsToCompare = lanePoints
-                            //.Skip(1)
+                            .Skip(2)
                             //.Take(12)
                             .Select(p => p.X)
                             .ToArray();

@@ -15,7 +15,7 @@ namespace AutoCruise.Modules
     {
         public static IContainer Container { get; private set; }
 
-        public static void BuildContainer()
+        public static void BuildContainer(MainWindow mainWindow)
         {
             if (Container == null)
             {
@@ -29,8 +29,8 @@ namespace AutoCruise.Modules
                 builder.RegisterType<OutGaugeParametersUpdater>().As<OutGaugeParametersUpdater>();
                 builder.RegisterType<Cruiser>().As<Cruiser>();
 
-                builder.RegisterInstance(new OpenCvImageViewer()).As<IImageViewer>();
-                //builder.RegisterType<WpfImageViewer>().As<IImageViewer>();
+                //builder.RegisterInstance(new OpenCvImageViewer()).As<IImageViewer>();
+                builder.RegisterInstance(mainWindow).As<IImageViewer>();
 
                 Container = builder.Build();
             }
@@ -73,13 +73,15 @@ namespace AutoCruise.Modules
                 outputControl = new KeyPressEmulator();
             }
 
-            try
+            var ffbControlProxy = new FfbWheelIntermediaryControl(outputControl, parameters);
+            if (ffbControlProxy.Initialized)
             {
-                return new FfbWheelIntermediaryControl(outputControl, parameters);
+                return ffbControlProxy;
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Logitech SDK failed, using pass-through control: "+ex.Message);
+                ffbControlProxy.Dispose();
+                MessageBox.Show("Logitech SDK not initialized (wheel not found?), using pass-through control");
                 return outputControl;
             }
         }

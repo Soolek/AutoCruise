@@ -12,7 +12,9 @@ namespace AutoCruise.Control
 {
     public class FfbWheelIntermediaryControl : IControl
     {
-        public IControl OutputControl { get; private set; }
+        public bool Initialized { get; private set; }
+
+        private IControl _outputControl { get; set; }
         private Parameters _parameters { get; set; }
 
         private int _maxOffset = 80;
@@ -24,48 +26,51 @@ namespace AutoCruise.Control
 
         public FfbWheelIntermediaryControl(IControl outputControl, Parameters parameters)
         {
-            OutputControl = outputControl;
+            _outputControl = outputControl;
             _parameters = parameters;
 
             InitializeLogi();
 
-            _logiTask = new Task(() =>
+            if (Initialized)
             {
-                Thread.Sleep(2000);
-
-                while (_logiTaskRun)
+                _logiTask = new Task(() =>
                 {
-                    if (_logiInitialized && LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(0))
+                    Thread.Sleep(2000);
+
+                    while (_logiTaskRun)
                     {
-                        var state = LogitechGSDK.LogiGetStateCSharp(0);
-                        DoWheelControl(state);
+                        if (Initialized && LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(0))
+                        {
+                            var state = LogitechGSDK.LogiGetStateCSharp(0);
+                            DoWheelControl(state);
+                        }
+                        Thread.Sleep(1);
                     }
-                    Thread.Sleep(1);
-                }
-            });
-            _logiTask.Start();
+                });
+                _logiTask.Start();
+            }
         }
 
         private void DoWheelControl(LogitechGSDK.DIJOYSTATE2ENGINES state)
         {
             float lateral = ((float)state.lX / Int16.MaxValue) / (_maxOffset / 100f);
-            OutputControl.SetLateral(lateral);
+            _outputControl.SetLateral(lateral);
 
             float acc = (float)(-state.lY + Int16.MaxValue) / (2 * Int16.MaxValue);
             float brake = (float)(-state.lRz + Int16.MaxValue) / (2 * Int16.MaxValue);
             float pedalsLongitudal = acc - brake;
-            OutputControl.SetLongitudal(pedalsLongitudal != 0 ? pedalsLongitudal : _inputLongitudal ?? 0);
+            _outputControl.SetLongitudal(pedalsLongitudal != 0 ? pedalsLongitudal : _inputLongitudal ?? 0);
 
             var pressedButtons = GetPressedButtons(state.rgbButtons);
             var justPressedButtons = GetJustPressedButtons(pressedButtons).ToList();
 
             if (justPressedButtons.Contains(10))
             {
-                OutputControl.ShiftDown();
+                _outputControl.ShiftDown();
             }
             if (justPressedButtons.Contains(11))
             {
-                OutputControl.ShiftUp();
+                _outputControl.ShiftUp();
             }
 
             if (_inputLateral != null)
@@ -123,13 +128,11 @@ namespace AutoCruise.Control
             return pressedButtons;
         }
 
-        private bool _logiInitialized = false;
         public void InitializeLogi()
         {
-            if (!_logiInitialized)
+            if (!Initialized)
             {
-                LogitechGSDK.LogiSteeringInitialize(true);
-                _logiInitialized = true;
+                Initialized = LogitechGSDK.LogiSteeringInitialize(true);
             }
         }
 
@@ -145,29 +148,33 @@ namespace AutoCruise.Control
 
         public void ShiftUp()
         {
-            OutputControl.ShiftUp();
+            _outputControl.ShiftUp();
         }
 
         public void ShiftDown()
         {
-            OutputControl.ShiftDown();
+            _outputControl.ShiftDown();
         }
 
         public void Ignition()
         {
-            OutputControl.Ignition();
+            _outputControl.Ignition();
         }
 
         public void Reset()
         {
-            OutputControl.Reset();
+            _outputControl.Reset();
         }
 
         public void Dispose()
         {
             _logiTaskRun = false;
-            OutputControl.Dispose();
             LogitechGSDK.LogiSteeringShutdown();
+
+            if (Initialized)
+            {
+                _outputControl.Dispose();
+            }
         }
     }
 }
