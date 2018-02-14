@@ -113,11 +113,10 @@ namespace AutoCruise.Modules
                 _parameters.MaxImageStep = imageStep - 1;
 
                 //CONTROL
-
                 float steering = 0;
 
                 //steer to center of lane
-                int maxYpoints = 4;
+                int maxYpoints = 5;
                 float laneSteering = 0;
                 for (int y = 2; y <= maxYpoints; y++)
                 {
@@ -125,7 +124,7 @@ namespace AutoCruise.Modules
                     laneSteering += (float)laneCenterOffset * 3 / Width;
                 }
                 laneSteering /= maxYpoints;
-                steering += laneSteering * 2f / 3f;
+                steering += laneSteering; //* 3f / 2f;
 
                 //steer parallel to lane
                 float directionSteering = 0;
@@ -139,7 +138,8 @@ namespace AutoCruise.Modules
 
                 _parameters.Steering = steering;
 
-                float desiredSpeed = 4 + 4f * (LaneStraightness(leftPoints) + LaneStraightness(rightPoints));
+                float straightness = Math.Min(LaneStraightness(leftPoints), LaneStraightness(rightPoints));
+                float desiredSpeed = 4 + 12f * (straightness * straightness);
                 var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - _parameters.Speed) / 8));
                 _parameters.Acc = Math.Max(0, longitudal);
                 _parameters.Brake = Math.Max(0, -longitudal);
@@ -195,7 +195,7 @@ namespace AutoCruise.Modules
         private float LaneStraightness(List<System.Drawing.Point> lanePoints)
         {
             var xsToCompare = lanePoints
-                            //.Skip(1)
+                            .Skip(2)
                             //.Take(12)
                             .Select(p => p.X)
                             .ToArray();
