@@ -164,6 +164,12 @@ namespace AutoCruise.Control
             if (!Initialized)
             {
                 Initialized = LogitechGSDK.LogiSteeringInitialize(true);
+                
+                LogitechGSDK.LogiControllerPropertiesData logiProperties = new LogitechGSDK.LogiControllerPropertiesData();
+                LogitechGSDK.LogiGetCurrentControllerProperties(0, ref logiProperties);
+                logiProperties.wheelRange = 520;
+
+                LogitechGSDK.LogiSetPreferredControllerProperties(logiProperties);
             }
         }
 
