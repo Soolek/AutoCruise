@@ -150,7 +150,6 @@
     <Compile Include="Helpers\ActionCommand.cs" />
     <Compile Include="ImageViewer\IImageViewer.cs" />
     <Compile Include="ImageViewer\OpenCvImageViewer.cs" />
-    <Compile Include="ImageViewer\WpfImageViewer.cs" />
     <Compile Include="Modules\AutofacConfiguration.cs" />
     <Compile Include="Modules\OutGaugeParametersUpdater.cs" />
     <Compile Include="Lib\LogitechGSDK.cs" />

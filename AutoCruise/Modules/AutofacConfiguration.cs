@@ -15,7 +15,7 @@ namespace AutoCruise.Modules
     {
         public static IContainer Container { get; private set; }
 
-        public static void BuildContainer()
+        public static void BuildContainer(MainWindow mainWindow)
         {
             if (Container == null)
             {
@@ -29,8 +29,8 @@ namespace AutoCruise.Modules
                 builder.RegisterType<OutGaugeParametersUpdater>().As<OutGaugeParametersUpdater>();
                 builder.RegisterType<Cruiser>().As<Cruiser>();
 
-                builder.RegisterInstance(new OpenCvImageViewer()).As<IImageViewer>();
-                //builder.RegisterType<WpfImageViewer>().As<IImageViewer>();
+                //builder.RegisterInstance(new OpenCvImageViewer()).As<IImageViewer>();
+                builder.RegisterInstance(mainWindow).As<IImageViewer>();
 
                 Container = builder.Build();
             }

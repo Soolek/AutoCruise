@@ -1,10 +1,12 @@
-﻿using System;
+﻿using AutoCruise.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace AutoCruise
@@ -233,20 +235,6 @@ namespace AutoCruise
             set
             {
                 this.Dispatcher.Invoke(() => SetValue(RpmProperty, value));
-            }
-        }
-
-        public static readonly DependencyProperty ImageProperty =
-            DependencyProperty.Register("Image", typeof(Bitmap), typeof(Parameters));
-        public Bitmap Image
-        {
-            get
-            {
-                return this.Dispatcher.Invoke(() => (Bitmap)GetValue(ImageProperty));
-            }
-            set
-            {
-                this.Dispatcher.Invoke(() => SetValue(ImageProperty, value));
             }
         }
     }

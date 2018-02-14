@@ -2,11 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="LFS AutoCruise" Height="350" Width="525" Closing="Window_Closing" Loaded="Window_Loaded">
+        Title="LFS AutoCruise" Height="510" Width="850" Closing="Window_Closing" Loaded="Window_Loaded">
     <Grid>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Background="DarkGray">
 
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Background="LightGray">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Background="LightGray" Width="200">
 
                 <StackPanel Orientation="Horizontal">
                     <Label Content="AutoDrive"/>
@@ -69,7 +69,7 @@
 
             </StackPanel>
 
-            <Image Source="{Binding Image}" Stretch="None"/>
+            <Image Name="DisplayImage" Width="640" Height="480"/>
 
         </StackPanel>
     </Grid>
