@@ -73,8 +73,6 @@ namespace AutoCruise.Modules
             _cruiseThread.Start();
         }
 
-
-
         private float _prevLateral = 0;
         private float _prevLongitudal = 0;
         private void Work()
@@ -124,7 +122,7 @@ namespace AutoCruise.Modules
                     laneSteering += (float)laneCenterOffset * 3 / Width;
                 }
                 laneSteering /= maxYpoints;
-                steering += laneSteering; //* 3f / 2f;
+                steering += laneSteering;
 
                 //steer parallel to lane
                 float directionSteering = 0;
@@ -135,6 +133,9 @@ namespace AutoCruise.Modules
                     + (leftPoints[y + 1].X - leftPoints[y].X) / 40f;
                 }
                 steering += directionSteering * 2f / 3f;
+
+                //steering gamma
+                steering *= Math.Sign(steering) * steering;
 
                 _parameters.Steering = steering;
 
@@ -161,7 +162,7 @@ namespace AutoCruise.Modules
                         _control.SetLateral(0);
                     }
                     //set Drive if reverse and standing still
-                    else if (_parameters.Gear <= 1 && _parameters.Speed < 1) 
+                    else if (_parameters.Gear <= 1 && _parameters.Speed < 1)
                     {
                         _control.ShiftUp();
                     }
