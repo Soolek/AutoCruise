@@ -140,20 +140,24 @@ namespace AutoCruise.Modules
                 _parameters.Steering = steering;
 
                 float straightness = Math.Min(LaneStraightness(leftPoints), LaneStraightness(rightPoints));
-                float desiredSpeed = 4 + 10f * (straightness * straightness);
+                float desiredSpeed = 4 + 15f * (straightness * straightness * straightness);
                 var longitudal = Math.Min(1, Math.Max(-1, (desiredSpeed - _parameters.Speed) / 8));
                 _parameters.Acc = Math.Max(0, longitudal);
                 _parameters.Brake = Math.Max(0, -longitudal);
 
                 if (_parameters.AutoDrive)
                 {
+                    //smooth out outwards steering, favor steering straight
                     var lateralDamper = Math.Max(0.1f, (Math.Abs(steering) - Math.Abs(_prevLateral)) * 10f);
                     var dampedSteering = (lateralDamper * _prevLateral + steering) / (lateralDamper + 1f);
-                    _prevLateral = dampedSteering;//steering;
+                    _prevLateral = dampedSteering;
                     _control.SetLateral(dampedSteering);
 
-                    _prevLongitudal = (_prevLongitudal * 2 + longitudal) / 3f;
-                    _control.SetLongitudal(_prevLongitudal);
+                    //smooth out acceleration, brake quickly
+                    var longitudalDamper = Math.Max(1f, (longitudal - _prevLongitudal) * 4f);
+                    var dampedLongitudal = (longitudalDamper * _prevLongitudal + longitudal) / (longitudalDamper + 1f);
+                    _prevLongitudal = dampedLongitudal;
+                    _control.SetLongitudal(dampedLongitudal);
 
                     //brake if going backwards
                     if (_parameters.Gear == 0 && _parameters.Speed > 0.5)
