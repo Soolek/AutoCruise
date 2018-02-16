@@ -24,6 +24,8 @@ namespace AutoCruise.Control
         private float? _inputLongitudal;
         private float? _inputLateral;
 
+        private int _logiWheelIndex = -1;
+
         public FfbWheelIntermediaryControl(IControl outputControl, Parameters parameters)
         {
             _outputControl = outputControl;
@@ -39,9 +41,9 @@ namespace AutoCruise.Control
 
                     while (_logiTaskRun)
                     {
-                        if (Initialized && LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(0))
+                        if (Initialized && LogitechGSDK.LogiUpdate() && LogitechGSDK.LogiIsConnected(_logiWheelIndex))
                         {
-                            var state = LogitechGSDK.LogiGetStateCSharp(0);
+                            var state = LogitechGSDK.LogiGetStateCSharp(_logiWheelIndex);
                             DoWheelControl(state);
                         }
                         Thread.Sleep(1);
@@ -67,27 +69,27 @@ namespace AutoCruise.Control
             var inputLateral = _inputLateral;
             if (inputLateral != null)
             {
-                LogitechGSDK.LogiStopDamperForce(0);
+                LogitechGSDK.LogiStopDamperForce(_logiWheelIndex);
                 if (Math.Abs(inputLateral.Value) < 0.02)
                 {
                     inputLateral = 0;
                 }
                 int feedbackForce = Math.Min(80, (int)(60 + _parameters.Speed * 2));
-                LogitechGSDK.LogiPlaySpringForce(0, (int)(inputLateral * _maxOffset), 60, feedbackForce);
+                LogitechGSDK.LogiPlaySpringForce(_logiWheelIndex, (int)(inputLateral * _maxOffset), 60, feedbackForce);
             }
             else
             {
                 int damper = (int)(Math.Max(0, 0.5f - _parameters.Speed) * 100);
                 if (damper > 0)
                 {
-                    LogitechGSDK.LogiStopSpringForce(0);
-                    LogitechGSDK.LogiPlayDamperForce(0, damper);
+                    LogitechGSDK.LogiStopSpringForce(_logiWheelIndex);
+                    LogitechGSDK.LogiPlayDamperForce(_logiWheelIndex, damper);
                 }
                 else
                 {
-                    LogitechGSDK.LogiStopDamperForce(0);
+                    LogitechGSDK.LogiStopDamperForce(_logiWheelIndex);
                     int centeringForce = Math.Min(90, (int)(20 + _parameters.Speed * 2));
-                    LogitechGSDK.LogiPlaySpringForce(0, 0, centeringForce, centeringForce);
+                    LogitechGSDK.LogiPlaySpringForce(_logiWheelIndex, 0, centeringForce, centeringForce);
                 }
             }
         }
@@ -163,14 +165,31 @@ namespace AutoCruise.Control
         {
             if (!Initialized)
             {
-                Initialized = LogitechGSDK.LogiSteeringInitialize(true);
-                
-                LogitechGSDK.LogiControllerPropertiesData logiProperties = new LogitechGSDK.LogiControllerPropertiesData();
-                LogitechGSDK.LogiGetCurrentControllerProperties(0, ref logiProperties);
-                logiProperties.wheelRange = 520;
+                if (Initialized = LogitechGSDK.LogiSteeringInitialize(true) &&
+                    (_logiWheelIndex = FindLogiWheelIndex()) >= 0)
+                {
+                    LogitechGSDK.LogiControllerPropertiesData logiProperties = new LogitechGSDK.LogiControllerPropertiesData();
+                    LogitechGSDK.LogiGetCurrentControllerProperties(_logiWheelIndex, ref logiProperties);
+                    logiProperties.wheelRange = 520;
 
-                LogitechGSDK.LogiSetPreferredControllerProperties(logiProperties);
+                    LogitechGSDK.LogiSetPreferredControllerProperties(logiProperties);
+                }
             }
+        }
+
+        private int FindLogiWheelIndex()
+        {
+            StringBuilder sb = new StringBuilder(255);
+            for (int i = 0; i < 4; i++)
+            {
+                sb.Clear();
+                LogitechGSDK.LogiGetFriendlyProductName(i, sb, 255);
+                if (sb.ToString().ToLower().Contains("wheel"))
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public void SetLateral(float? lateral)

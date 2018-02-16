@@ -81,7 +81,7 @@ namespace AutoCruise.Modules
             else
             {
                 ffbControlProxy.Dispose();
-                MessageBox.Show("Logitech SDK not initialized (wheel not found?), using pass-through control");
+                MessageBox.Show("Logitech wheel not found, using pass-through control");
                 return outputControl;
             }
         }
