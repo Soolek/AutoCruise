@@ -13,7 +13,7 @@ AutoCruise
 'OutGauge Port 666'  
 'OutGauge ID 0'
 Recommended view settings (for XFG):
-(lfs_view_settings.png)
+![view settings](lfs_view_settings.png)
 2. Use keys: I(forward), J(left), K(back), L(right), Y(gear up), H(gear down), U(ignition) to configure vJoy axis in LFS
 * Install vJoy (default settings should work)
 * For Ffb steering you need LogitechSDK compliant wheel
