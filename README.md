@@ -2,7 +2,7 @@ AutoCruise
 : .Net vision based cruise and steer controller
 =========================================================
 
-[![youtube link](youtube_movie_link_image.jpg)](https://www.youtube.com/watch?v=MKALTq9Zse0)
+[![youtube link](youtube_movie_link_image.jpg)](https://youtu.be/jKJhDTwFSVY)
 
 # Installation
 * Get LiveForSpeed [www.lfs.net](http://www.lfs.net)
